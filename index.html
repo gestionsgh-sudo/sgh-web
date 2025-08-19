@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es-ES">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>SGH | Inicio</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Fallback si el JS no llegara a ejecutarse (2 s) -->
+  <meta http-equiv="refresh" content="2; url=registro.html">
+  <script>
+    (function(){
+      try{
+        // ¿Está "logueado"? (marca simple de sesión que podrás poner al finalizar el acceso)
+        var hasAuth = (localStorage.getItem('sgh_auth') === '1') || document.cookie.indexOf('sgh_auth=1') > -1;
+        var qs = (location.search || '') + (location.hash || '');
+        var target = hasAuth ? 'paneles.html' : 'registro.html';
+        // Redirige sin dejar rastro en el historial y conservando parámetros
+        window.location.replace(target + qs);
+      }catch(e){
+        // En caso de error, no hacemos nada: se mostrará el contenido fallback de la página.
+      }
+    })();
+  </script>
+</head>
+<body>
+
+<!-- Barra de confianza -->
+<div class="trustbar">
+  <div class="container">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M12 3l7 3v6c0 5-3.5 9-7 9s-7-4-7-9V6l7-3z" stroke-width="1.6"/>
+      <path d="M9 12l2 2 4-4" stroke-width="1.8"/>
+    </svg>
+    <span>RGPD: datos mínimos, cifrado en tránsito, control por el usuario</span>
+  </div>
+</div>
+
+<!-- Cabecera mínima -->
+<header class="header">
+  <div class="container">
+    <a class="logo" href="index.html" aria-label="Inicio SGH">
+      <div class="logo-mark">S</div>
+      SGH | Tu Trámite, Resuelto
+    </a>
+    <nav class="nav" aria-label="principal">
+      <a href="quienes-somos.html">¿Quiénes somos?</a>
+      <a href="aviso-legal.html">Legal</a>
+      <a href="contacto.html">Contacto</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Contenido fallback (se ve solo si no se ejecuta la redirección inmediata) -->
+<main class="container stack" style="padding:24px 0">
+  <section class="card">
+    <h1 style="font-size:var(--h2);margin:0 0 8px">Redirigiendo…</h1>
+    <p id="status" class="small" style="color:var(--c-muted)" aria-live="polite">
+      Te llevamos a la página adecuada. Si no ocurre en unos segundos:
+    </p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      <a class="btn btn-primary" href="registro.html">Ir a Registro</a>
+      <a class="btn btn-secondary" href="paneles.html">Ir al Panel de trámites</a>
+    </div>
+  </section>
+
+  <section class="card small" style="color:var(--c-muted)">
+    <strong>Transparencia:</strong> Página <b>no oficial</b> del Estado. Servicio automatizado que no sustituye a profesionales
+    (abogado, gestor o administrador). Consulta la <a href="privacidad.html">Privacidad</a> y las <a href="cookies.html">Cookies</a>.
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container cols">
+    <div class="small">© SGH · Datos mínimos, sin publicidad ni seguimiento.</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <a href="aviso-legal.html">Aviso legal</a>
+      <a href="privacidad.html">Privacidad</a>
+      <a href="cookies.html">Cookies</a>
+      <a href="contacto.html">Contacto</a>
+    </div>
+  </div>
+</footer>
+
+<noscript>
+  <div class="container" style="padding:16px 0">
+    <div class="notice">
+      <p class="small">Tu navegador tiene JavaScript desactivado. Usa estos enlaces:</p>
+      <p>
+        <a href="registro.html">Ir a Registro</a> ·
+        <a href="paneles.html">Ir al Panel de trámites</a>
+      </p>
+    </div>
+  </div>
+</noscript>
+
+</body>
+</html>
