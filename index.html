@@ -3,29 +3,35 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="light">
   <title>SGH | Inicio</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Fallback si el JS no llegara a ejecutarse (2 s) -->
-  <meta http-equiv="refresh" content="2; url=registro.html">
-  <script>
-    (function(){
-      try{
-        // ¿Está "logueado"? (marca simple de sesión que podrás poner al finalizar el acceso)
-        var hasAuth = (localStorage.getItem('sgh_auth') === '1') || document.cookie.indexOf('sgh_auth=1') > -1;
-        var qs = (location.search || '') + (location.hash || '');
-        var target = hasAuth ? 'paneles.html' : 'registro.html';
-        // Redirige sin dejar rastro en el historial y conservando parámetros
-        window.location.replace(target + qs);
-      }catch(e){
-        // En caso de error, no hacemos nada: se mostrará el contenido fallback de la página.
-      }
-    })();
-  </script>
+  <style>
+    /* Estilos propios de la portada */
+    .hero-landing{
+      padding:56px 0 64px;
+      background:
+        radial-gradient(1200px 420px at 15% -10%, color-mix(in srgb, var(--c-secondary) 12%, #fff), transparent 60%),
+        radial-gradient(1200px 420px at 100% 0%, color-mix(in srgb, var(--c-primary) 12%, #fff), transparent 60%);
+      border:1px solid var(--c-border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      background-color:#fff;
+    }
+    .brand-mark{
+      width:64px;height:64px;border-radius:16px;
+      display:grid;place-items:center;font-weight:900;
+      color:var(--c-primary);
+      background:color-mix(in srgb, var(--c-primary) 12%, #fff);
+      border:1px solid var(--c-border);
+      box-shadow:0 6px 14px rgba(0,0,0,.04);
+    }
+    .hairline{height:1px;background:var(--c-border);margin:12px 0 20px;border-radius:1px}
+    .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+  </style>
 </head>
 <body>
 
-<!-- Barra de confianza -->
+<!-- Barra confianza -->
 <div class="trustbar">
   <div class="container">
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -36,12 +42,11 @@
   </div>
 </div>
 
-<!-- Cabecera mínima -->
+<!-- Cabecera simple -->
 <header class="header">
   <div class="container">
     <a class="logo" href="index.html" aria-label="Inicio SGH">
-      <div class="logo-mark">S</div>
-      SGH | Tu Trámite, Resuelto
+      <div class="logo-mark">S</div> SGH
     </a>
     <nav class="nav" aria-label="principal">
       <a href="quienes-somos.html">¿Quiénes somos?</a>
@@ -51,22 +56,29 @@
   </div>
 </header>
 
-<!-- Contenido fallback (se ve solo si no se ejecuta la redirección inmediata) -->
-<main class="container stack" style="padding:24px 0">
-  <section class="card">
-    <h1 style="font-size:var(--h2);margin:0 0 8px">Redirigiendo…</h1>
-    <p id="status" class="small" style="color:var(--c-muted)" aria-live="polite">
-      Te llevamos a la página adecuada. Si no ocurre en unos segundos:
-    </p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
-      <a class="btn btn-primary" href="registro.html">Ir a Registro</a>
-      <a class="btn btn-secondary" href="paneles.html">Ir al Panel de trámites</a>
+<main class="container" style="padding:28px 0 40px">
+  <section class="hero-landing card">
+    <div class="stack-12" style="align-items:flex-start">
+      <div class="brand-mark">S</div>
+      <div class="hairline"></div>
+      <h1 class="h1" style="font-size:var(--h1);margin:0;letter-spacing:-.02em">
+        Tu Trámite, Resuelto
+      </h1>
+      <p class="muted" style="margin:4px 0 14px">
+        Documentos claros, listos para presentar. Diseño gov-tech, simple y fiable.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="registro.html?tab=registro">Crear cuenta</a>
+        <a class="btn btn-secondary" href="registro.html?tab=acceso">Entrar</a>
+      </div>
     </div>
   </section>
 
-  <section class="card small" style="color:var(--c-muted)">
-    <strong>Transparencia:</strong> Página <b>no oficial</b> del Estado. Servicio automatizado que no sustituye a profesionales
-    (abogado, gestor o administrador). Consulta la <a href="privacidad.html">Privacidad</a> y las <a href="cookies.html">Cookies</a>.
+  <section class="stack" style="margin-top:18px">
+    <div class="notice">
+      <strong>Aviso:</strong> Servicio automatizado y <b>no oficial</b> del Estado. No sustituye a profesionales
+      (abogado, gestor o administrador). Consulta <a href="privacidad.html">Privacidad</a> y <a href="cookies.html">Cookies</a>.
+    </div>
   </section>
 </main>
 
@@ -81,18 +93,6 @@
     </div>
   </div>
 </footer>
-
-<noscript>
-  <div class="container" style="padding:16px 0">
-    <div class="notice">
-      <p class="small">Tu navegador tiene JavaScript desactivado. Usa estos enlaces:</p>
-      <p>
-        <a href="registro.html">Ir a Registro</a> ·
-        <a href="paneles.html">Ir al Panel de trámites</a>
-      </p>
-    </div>
-  </div>
-</noscript>
 
 </body>
 </html>
