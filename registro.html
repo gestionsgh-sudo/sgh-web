@@ -106,3 +106,123 @@
             <a href="aviso-legal.html" target="_blank" rel="noopener">Aviso legal</a>. Esta página es <strong>no oficial</strong> del Estado.
           </label>
         </div>
+
+        <div class="center" style="gap:10px;margin-top:8px">
+          <button id="btnReg" class="btn btn-primary" type="submit">Crear cuenta</button>
+          <a class="btn btn-secondary" href="dgt-multas.html">Usar sin registrarme</a>
+        </div>
+        <p class="muted" style="margin-top:12px">
+          No guardamos contraseñas. Te enviaremos un correo de bienvenida con instrucciones.
+        </p>
+        <p id="status-reg" class="status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <!-- Panel Acceso (enlace mágico) -->
+    <div id="panel-log" role="tabpanel" aria-labelledby="t-log" hidden>
+      <form action="https://hook.eu2.make.com/an6s374mshxd7iol5f84pybd2ddkxggl" method="POST" id="form-log" accept-charset="UTF-8" novalidate>
+        <input type="hidden" name="form_name" value="acceso">
+        <input type="hidden" name="timestamp_iso" id="ts_log">
+        <input type="hidden" name="source_url" id="src_log">
+        <input type="hidden" name="consent_version" value="v1.0">
+        <div class="hp">
+          <label for="l-web">Si ves este campo, déjalo vacío</label>
+          <input id="l-web" name="website" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="l-email">Correo electrónico *</label>
+          <input id="l-email" type="email" name="email" autocomplete="email"
+                 inputmode="email" required>
+        </div>
+        <div class="center" style="gap:10px;margin-top:8px">
+          <button id="btnLog" class="btn btn-primary" type="submit">Enviarme enlace de acceso</button>
+          <a class="btn btn-secondary" href="dgt-multas.html">Ir a DGT</a>
+        </div>
+        <p class="muted" style="margin-top:12px">Recibirás un enlace temporal para entrar. Sin contraseñas.</p>
+        <p id="status-log" class="status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div class="notice" style="margin-top:16px">
+      <strong>Transparencia:</strong> Servicio automatizado y <strong>no oficial</strong> del Estado. No sustituye a profesionales
+      (abogado, gestor o administrador). Para casos complejos, consulta con un profesional.
+    </div>
+
+    <noscript>
+      <p class="muted" style="margin-top:12px">
+        Nota: si no ves las pestañas, tu navegador tiene JavaScript desactivado. Verás ambos formularios uno debajo del otro.
+      </p>
+    </noscript>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container cols">
+    <div class="small">
+      © SGH – Datos mínimos, sin publicidad ni seguimiento. <a href="cookies.html">Cookies</a>.
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <a href="aviso-legal.html">Aviso legal</a>
+      <a href="privacidad.html">Privacidad</a>
+      <a href="contacto.html">Contacto</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ===== Pestañas accesibles (ratón + teclado) ===== */
+const tReg = document.getElementById('t-reg');
+const tLog = document.getElementById('t-log');
+const pReg = document.getElementById('panel-reg');
+const pLog = document.getElementById('panel-log');
+
+function selectTab(which){
+  const isReg = which==='reg';
+  tReg.setAttribute('aria-selected', isReg);
+  tLog.setAttribute('aria-selected', !isReg);
+  tReg.tabIndex = isReg ? 0 : -1;
+  tLog.tabIndex = isReg ? -1 : 0;
+  pReg.hidden = !isReg;
+  pLog.hidden = isReg;
+  (isReg ? tReg : tLog).focus();
+}
+tReg.addEventListener('click', ()=>selectTab('reg'));
+tLog.addEventListener('click', ()=>selectTab('log'));
+document.getElementById('tabs').addEventListener('keydown', (e)=>{
+  if(e.key==='ArrowRight') { e.preventDefault(); selectTab('log'); }
+  if(e.key==='ArrowLeft')  { e.preventDefault(); selectTab('reg'); }
+});
+
+/* ===== Campos ocultos comunes ===== */
+function setHidden(formId, tsId, srcId){
+  const f = document.getElementById(formId);
+  document.getElementById(tsId).value  = new Date().toISOString();
+  document.getElementById(srcId).value = location.href;
+}
+setHidden('form-reg','ts_reg','src_reg');
+setHidden('form-log','ts_log','src_log');
+
+/* ===== Anti-spam, evitar doble envío y estado ===== */
+function wireForm(formId, btnId, hpId, statusId){
+  const form = document.getElementById(formId);
+  const btn  = document.getElementById(btnId);
+  const hp   = document.getElementById(hpId);
+  const st   = document.getElementById(statusId);
+  form.addEventListener('submit', (e)=>{
+    if(hp.value){ e.preventDefault(); return; }          // bot
+    if(!form.checkValidity()){
+      e.preventDefault();
+      st.textContent = 'Revisa los campos marcados.';
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = 'Enviando…';
+    st.textContent = 'Enviando…';
+  });
+}
+wireForm('form-reg','btnReg','r-web','status-reg');
+wireForm('form-log','btnLog','l-web','status-log');
+</script>
+</body>
+</html>
