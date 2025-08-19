@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es-ES">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>SGH | Tu Trámite, Resuelto · Registro</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Estilos locales mínimos */
+    .auth-wrap{min-height:calc(100dvh - 80px);display:grid;place-items:center}
+    .auth{width:min(600px,92vw)}
+    .tabs{display:flex;gap:8px;margin:0 0 12px}
+    .tab{flex:1;text-align:center;padding:10px;border:1px solid var(--c-border);
+         background:#fff;border-radius:12px;font-weight:700;cursor:pointer}
+    .tab[aria-selected="true"]{background:color-mix(in srgb,var(--c-primary) 8%,#fff);
+         border-color:color-mix(in srgb,var(--c-primary) 25%,#fff)}
+    .field{margin:10px 0}
+    .field label{font-weight:600;margin-bottom:6px;display:block}
+    .field input{width:100%;height:44px;border:1px solid var(--c-border);
+         border-radius:12px;padding:0 12px;background:#fff}
+    .agree{display:flex;gap:8px;align-items:flex-start}
+    .muted{color:var(--c-muted);font-size:14px}
+    .center{display:flex;justify-content:center}
+    .hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden} /* honeypot */
+    .status{font-size:14px;color:var(--c-muted);margin-top:8px}
+  </style>
+</head>
+<body>
+
+<!-- Barra superior -->
+<div class="trustbar">
+  <div class="container">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M12 3l7 3v6c0 5-3.5 9-7 9s-7-4-7-9V6l7-3z" stroke-width="1.6"/>
+      <path d="M9 12l2 2 4-4" stroke-width="1.8"/>
+    </svg>
+    <span>RGPD: datos mínimos, cifrado en tránsito, control por el usuario</span>
+  </div>
+</div>
+
+<!-- Cabecera -->
+<header class="header">
+  <div class="container">
+    <a class="logo" href="index.html" aria-label="Inicio SGH">
+      <div class="logo-mark">S</div> SGH | Tu Trámite, Resuelto
+    </a>
+    <nav class="nav" aria-label="principal">
+      <a href="aviso-legal.html">Legal</a>
+      <a href="privacidad.html">Privacidad</a>
+      <a href="cookies.html">Cookies</a>
+      <a class="btn btn-ghost" href="dgt-multas.html">Ir a DGT</a>
+    </nav>
+  </div>
+</header>
+
+<main class="auth-wrap container">
+  <section class="auth card" aria-labelledby="titulo-auth">
+    <h1 id="titulo-auth" style="font-size:var(--h1);margin:0 0 6px;letter-spacing:-.02em">
+      SGH | Tu Trámite, Resuelto
+    </h1>
+    <p class="muted" style="margin:0 0 12px">Documentos claros, listos para presentar.</p>
+
+    <!-- Pestañas accesibles -->
+    <div id="tabs" role="tablist" aria-label="Registro o acceso" class="tabs">
+      <button id="t-reg" class="tab" role="tab" aria-selected="true"
+              aria-controls="panel-reg" tabindex="0">Crear cuenta</button>
+      <button id="t-log" class="tab" role="tab" aria-selected="false"
+              aria-controls="panel-log" tabindex="-1">Entrar</button>
+    </div>
+
+    <!-- Panel Registro -->
+    <div id="panel-reg" role="tabpanel" aria-labelledby="t-reg">
+      <form action="https://hook.eu2.make.com/a8h3mpvg6yfsjs53wajm4jk93mixl4bl"
+            method="POST" id="form-reg" accept-charset="UTF-8" novalidate>
+        <input type="hidden" name="form_name" value="registro">
+        <input type="hidden" name="timestamp_iso" id="ts_reg">
+        <input type="hidden" name="source_url" id="src_reg">
+        <input type="hidden" name="consent_version" value="v1.0">
+        <!-- Honeypot antispam -->
+        <div class="hp">
+          <label for="r-web">Si ves este campo, déjalo vacío</label>
+          <input id="r-web" name="website" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="r-nombre">Nombre y apellidos *</label>
+          <input id="r-nombre" name="nombre_completo" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="r-email">Correo electrónico *</label>
+          <input id="r-email" type="email" name="email" autocomplete="email"
+                 inputmode="email" required>
+        </div>
+        <div class="field">
+          <label for="r-telefono">Teléfono <span class="muted">(opcional)</span></label>
+          <input id="r-telefono" name="telefono" autocomplete="tel" inputmode="tel"
+                 placeholder="612 34 56 78"
+                 pattern="^(\+34\s?)?([6-9]\d{2}[\s\-]?\d{3}[\s\-]?\d{3})$"
+                 title="Formato válido: 612345678, 612 34 56 78 o con +34">
+        </div>
+        <div class="field agree">
+          <input id="r-rgpd" type="checkbox" name="acepto_rgpd" required>
+          <label for="r-rgpd" class="muted">
+            He leído y acepto la <a href="privacidad.html" target="_blank" rel="noopener">Política de Privacidad</a> y el
+            <a href="aviso-legal.html" target="_blank" rel="noopener">Aviso legal</a>. Esta página es <strong>no oficial</strong> del Estado.
+          </label>
+        </div>
