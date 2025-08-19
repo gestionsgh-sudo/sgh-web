@@ -3,35 +3,58 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>SGH | Inicio</title>
+  <title>SGH | Tu Trámite, Resuelto</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Estilos propios de la portada */
-    .hero-landing{
-      padding:56px 0 64px;
-      background:
-        radial-gradient(1200px 420px at 15% -10%, color-mix(in srgb, var(--c-secondary) 12%, #fff), transparent 60%),
-        radial-gradient(1200px 420px at 100% 0%, color-mix(in srgb, var(--c-primary) 12%, #fff), transparent 60%);
-      border:1px solid var(--c-border);
-      border-radius:16px;
-      box-shadow:var(--shadow);
-      background-color:#fff;
+    /* ===== Portada (añadidos específicos, el resto usa style.css) ===== */
+    .masthead{background:#fff;border-bottom:1px solid var(--c-border)}
+    .masthead .container{display:flex;align-items:center;gap:16px;padding:14px var(--gap)}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:-.01em;color:var(--c-text)}
+    .brand-badge{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+      color:var(--c-primary);background:color-mix(in srgb,var(--c-primary) 12%,#fff);border:1px solid var(--c-border)}
+    .nav a{color:var(--c-text);padding:8px 10px;border-radius:10px}
+    .nav a:hover{background:color-mix(in srgb,var(--c-primary) 8%, #fff)}
+
+    .hero-pro{
+      border-radius:16px;border:1px solid var(--c-border);background:#fff;box-shadow:var(--shadow);
+      padding:28px;
+      background-image:
+        radial-gradient(1200px 420px at 100% -30%, color-mix(in srgb, var(--c-primary) 10%, #fff), transparent 65%),
+        radial-gradient(1200px 420px at -5% 120%, color-mix(in srgb, var(--c-secondary) 10%, #fff), transparent 65%);
+      background-repeat:no-repeat;
     }
-    .brand-mark{
-      width:64px;height:64px;border-radius:16px;
-      display:grid;place-items:center;font-weight:900;
-      color:var(--c-primary);
-      background:color-mix(in srgb, var(--c-primary) 12%, #fff);
-      border:1px solid var(--c-border);
-      box-shadow:0 6px 14px rgba(0,0,0,.04);
+    .landing-grid{display:grid;gap:24px}
+    @media (min-width:980px){ .landing-grid{grid-template-columns:1.15fr .85fr} }
+
+    .lead{font-size:var(--h1);font-weight:900;letter-spacing:-.02em;margin:6px 0 8px}
+    .sub{color:var(--c-muted);margin:0 0 14px}
+
+    .tray{
+      background:#fff;border:1px solid var(--c-border);border-radius:14px;padding:16px;
+      box-shadow:var(--shadow)
     }
-    .hairline{height:1px;background:var(--c-border);margin:12px 0 20px;border-radius:1px}
-    .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+    .tray h3{font-size:var(--h3);margin:0 0 8px}
+    .tray ul{margin:0;padding-left:18px}
+    .tray li{margin:6px 0}
+    .badge-soft{display:inline-block;font-size:12px;border-radius:999px;padding:4px 10px;
+      background:color-mix(in srgb,var(--c-primary) 10%, #fff);border:1px solid var(--c-border)}
+
+    .steps.grid{grid-template-columns:1fr}
+    @media (min-width:900px){ .steps.grid{grid-template-columns:repeat(3,1fr)} }
+    .step{background:#fff;border:1px solid var(--c-border);border-radius:14px;padding:16px}
+    .step h4{margin:6px 0 8px;font-size:18px}
+
+    .bullets{display:grid;gap:10px}
+    @media (min-width:900px){ .bullets{grid-template-columns:repeat(3,1fr)} }
+    .bullets li{list-style:none;display:flex;gap:10px;align-items:flex-start}
+    .bullets svg{width:20px;height:20px;color:var(--c-success);flex:0 0 20px}
+
+    .cta-band a{white-space:nowrap}
   </style>
 </head>
 <body>
 
-<!-- Barra confianza -->
+<!-- Barra de confianza -->
 <div class="trustbar">
   <div class="container">
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -42,13 +65,14 @@
   </div>
 </div>
 
-<!-- Cabecera simple -->
-<header class="header">
+<!-- Cabecera profesional -->
+<header class="masthead">
   <div class="container">
-    <a class="logo" href="index.html" aria-label="Inicio SGH">
-      <div class="logo-mark">S</div> SGH
+    <a href="index.html" class="brand" aria-label="Inicio">
+      <div class="brand-badge">S</div>
+      <span>SGH</span>
     </a>
-    <nav class="nav" aria-label="principal">
+    <nav class="nav" aria-label="principal" style="margin-left:auto;display:flex;gap:14px;flex-wrap:wrap">
       <a href="quienes-somos.html">¿Quiénes somos?</a>
       <a href="aviso-legal.html">Legal</a>
       <a href="contacto.html">Contacto</a>
@@ -56,35 +80,97 @@
   </div>
 </header>
 
-<main class="container" style="padding:28px 0 40px">
-  <section class="hero-landing card">
-    <div class="stack-12" style="align-items:flex-start">
-      <div class="brand-mark">S</div>
-      <div class="hairline"></div>
-      <h1 class="h1" style="font-size:var(--h1);margin:0;letter-spacing:-.02em">
-        Tu Trámite, Resuelto
-      </h1>
-      <p class="muted" style="margin:4px 0 14px">
-        Documentos claros, listos para presentar. Diseño gov-tech, simple y fiable.
-      </p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="registro.html?tab=registro">Crear cuenta</a>
-        <a class="btn btn-secondary" href="registro.html?tab=acceso">Entrar</a>
+<main class="container stack" style="padding:28px 0 40px">
+
+  <!-- HÉROE -->
+  <section class="hero-pro">
+    <div class="landing-grid">
+      <!-- Columna izquierda: mensaje y acciones -->
+      <div>
+        <div class="badge-soft">Plataforma documental</div>
+        <h1 class="lead">Tu Trámite, Resuelto</h1>
+        <p class="sub">Documentos claros, listos para presentar. Estilo “gov-tech”: simple, fiable y accesible.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a class="btn btn-primary" href="registro.html?tab=registro" aria-label="Crear cuenta">Crear cuenta</a>
+          <a class="btn btn-secondary" href="registro.html?tab=acceso" aria-label="Entrar">Entrar</a>
+        </div>
+      </div>
+
+      <!-- Columna derecha: tarjeta de trámites destacados -->
+      <aside class="tray" aria-label="Trámites disponibles">
+        <h3>Trámites disponibles</h3>
+        <ul>
+          <li><strong>DGT · Alegaciones / Recurso</strong> — Documento listo, checklist y enlaces oficiales.</li>
+          <li>Herencias — modelos básicos y guía práctica. <span class="badge-soft">En preparación</span></li>
+          <li>Vivienda / Educación — próximos.</li>
+        </ul>
+        <div style="margin-top:12px">
+          <a class="btn btn-ghost" href="paneles.html">Ver todos los trámites →</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="stack" style="margin-top:28px">
+    <h2 style="font-size:var(--h2);margin:0">Cómo funciona</h2>
+    <div class="grid steps">
+      <div class="step">
+        <h4>1) Responde al asistente</h4>
+        <p class="muted">Preguntas claras y en español. Validamos plazos (DEV/DEHú, edictos, etc.).</p>
+      </div>
+      <div class="step">
+        <h4>2) Documento listo</h4>
+        <p class="muted">Generamos el PDF con anexos y checklist para REG o Sede DGT.</p>
+      </div>
+      <div class="step">
+        <h4>3) Presenta online</h4>
+        <p class="muted">Incluimos enlaces a la sede electrónica y pasos de registro.</p>
       </div>
     </div>
   </section>
 
-  <section class="stack" style="margin-top:18px">
-    <div class="notice">
-      <strong>Aviso:</strong> Servicio automatizado y <b>no oficial</b> del Estado. No sustituye a profesionales
-      (abogado, gestor o administrador). Consulta <a href="privacidad.html">Privacidad</a> y <a href="cookies.html">Cookies</a>.
+  <!-- SEGURIDAD Y CUMPLIMIENTO -->
+  <section class="card">
+    <h2 style="font-size:var(--h2);margin:0 0 10px">Seguridad y cumplimiento</h2>
+    <ul class="bullets">
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 7l-8 10-4-4" stroke-width="2"/></svg>
+        <span><strong>RGPD desde el diseño</strong>: datos mínimos y conservación limitada.</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l7 4v5c0 5-3 9-7 9s-7-4-7-9V7l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span><strong>Cifrado TLS</strong>: tus datos viajan seguros; sin publicidad ni rastreadores.</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M7 6v12m10-12v12M3 18h18"/></svg>
+        <span><strong>Enlaces oficiales</strong>: Sede DGT y Registro Electrónico General.</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="cta-band" style="margin-top:24px">
+    <div>
+      <h3 style="margin:0 0 6px">Empieza en minutos</h3>
+      <p class="small" style="margin:0">Sin descargas. Servicio automatizado y <b>no oficial</b> del Estado.</p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a class="btn btn-primary" href="registro.html?tab=registro">Crear cuenta</a>
+      <a class="btn btn-secondary" href="paneles.html">Ver trámites</a>
     </div>
   </section>
+
+  <!-- Aviso -->
+  <section class="notice" style="margin-top:16px">
+    <strong>Aviso:</strong> No sustituimos a profesionales (abogado, gestor o administrador). Para casos complejos, contacta con un profesional.
+  </section>
+
 </main>
 
 <footer class="footer">
   <div class="container cols">
-    <div class="small">© SGH · Datos mínimos, sin publicidad ni seguimiento.</div>
+    <div class="small">© SGH – Datos mínimos, sin publicidad ni seguimiento.</div>
     <div style="display:flex;gap:14px;flex-wrap:wrap">
       <a href="aviso-legal.html">Aviso legal</a>
       <a href="privacidad.html">Privacidad</a>
