@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="es-ES">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>SGH | Panel de trámites</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Skip link */
+  .skip{position:absolute;left:-9999px;top:auto;background:#fff;border:1px solid var(--c-border);
+        padding:8px 12px;border-radius:10px}
+  .skip:focus{left:12px;top:12px;z-index:10000}
+
+  /* Top line */
+  .topline{background:#fff;border-bottom:1px solid var(--c-border)}
+  .topline .container{display:flex;gap:16px;justify-content:flex-end;padding:8px var(--gap)}
+  .topline a{color:var(--c-text)}
+  .topline a:hover{background:color-mix(in srgb, var(--c-primary) 8%, white);border-radius:10px;padding:2px 8px}
+
+  /* App bar */
+  .appbar{background:#fff;border-bottom:1px solid var(--c-border)}
+  .appbar .container{display:flex;align-items:center;gap:12px;padding:12px var(--gap)}
+  .burger{width:42px;height:42px;border-radius:12px;border:1px solid var(--c-border);
+          display:grid;place-items:center;background:#fff;cursor:pointer}
+  .burger:hover{background:color-mix(in srgb, var(--c-primary) 6%, white)}
+  .app-title{font-weight:900;letter-spacing:-.01em}
+
+  /* Drawer (visible por defecto si no hay JS) */
+  .drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none}
+  .drawer{position:fixed;inset:0 auto 0 0;width:min(320px,86vw);background:#fff;border-right:1px solid var(--c-border);
+          transform:none;transition:transform .25s ease;display:grid;grid-template-rows:auto 1fr auto;z-index:9998}
+  .drawer header{padding:12px 16px;border-bottom:1px solid var(--c-border);font-weight:800;display:flex;justify-content:space-between;align-items:center}
+  .drawer .close{border:1px solid var(--c-border);background:#fff;border-radius:10px;padding:6px 10px;cursor:pointer}
+  .drawer nav a{display:block;padding:12px 16px;border-bottom:1px solid var(--c-border);color:var(--c-text);}
+  .drawer nav a:hover{background:color-mix(in srgb, var(--c-primary) 8%, white)}
+  .drawer nav a[aria-current="page"]{background:color-mix(in srgb, var(--c-primary) 12%, white);font-weight:700}
+  .drawer .small{padding:12px 16px}
+
+  /* Estado cerrado (se aplica cuando hay JS) */
+  .drawer.js-close{transform:translateX(-100%)}
+  .drawer-backdrop.show{display:block}
+
+  /* Main */
+  .hero-min{padding:24px 0}
+  .hero-min h1{font-size:var(--h2);margin:0 0 6px;letter-spacing:-.02em}
+  .grid-mini{display:grid;gap:16px}
+  @media(min-width:900px){ .grid-mini{grid-template-columns:repeat(4,1fr)} }
+  .tile{background:#fff;border:1px solid var(--c-border);border-radius:16px;box-shadow:var(--shadow);padding:18px;display:grid;align-content:start;gap:8px}
+  .badge{display:inline-block;background:color-mix(in srgb, var(--c-primary) 10%, white);border:1px solid var(--c-border);
+         border-radius:999px;padding:4px 10px;font-size:12px}
+
+  /* Cookies */
+  .cookie-banner{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--c-border);
+    box-shadow:0 -8px 18px rgba(0,0,0,.06);z-index:9999;display:none}
+  .cookie-banner .container{display:grid;gap:12px;padding:14px var(--gap)}
+  @media(min-width:900px){ .cookie-banner .container{grid-template-columns:1fr auto} }
+  .cookie-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .cookie-link{color:var(--c-secondary);text-decoration:underline}
+  .cookie-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:10000}
+  .cookie-modal .box{background:#fff;border:1px solid var(--c-border);border-radius:16px;box-shadow:var(--shadow);
+    width:min(720px,92vw);margin:6vh auto;padding:18px}
+  .opt{display:flex;justify-content:space-between;gap:12px;border:1px solid var(--c-border);
+    border-radius:12px;padding:10px 12px;margin:10px 0}
+  .opt small{color:var(--c-muted)}
+  .switch{display:inline-flex;align-items:center;gap:8px}
+
+  @media (prefers-reduced-motion: reduce){ .drawer, .drawer-backdrop { transition:none } }
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<!-- Línea superior -->
+<div class="topline">
+  <div class="container">
+    <a href="quienes-somos.html">¿Quiénes somos?</a>
+    <a href="aviso-legal.html">Legal</a>
+    <a href="contacto.html">Contacto</a>
+  </div>
+</div>
+
+<!-- App bar -->
+<header class="appbar" role="banner">
+  <div class="container">
+    <button id="btnMenu" class="burger" type="button" aria-label="Abrir menú" aria-controls="drawer" aria-expanded="false">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M4 7h16M4 12h16M4 17h12" stroke-width="1.6"/>
+      </svg>
+    </button>
+    <div class="app-title">SGH | Panel de trámites</div>
+  </div>
+</header>
+
+<!-- Drawer -->
+<div id="backdrop" class="drawer-backdrop" hidden></div>
+<aside id="drawer" class="drawer js-close" aria-hidden="true" aria-label="Menú de trámites">
+  <header>
+    <span>Trámites</span>
+    <button id="btnClose" class="close" type="button" aria-label="Cerrar menú">Cerrar</button>
+  </header>
+  <nav aria-label="lista de trámites">
+    <a href="dgt-multas.html">DGT · Multas</a>
+    <a href="herencias.html">Herencias</a>
+    <a href="#" aria-disabled="true" tabindex="-1">Trámite vivienda (próx.)</a>
+    <a href="#" aria-disabled="true" tabindex="-1">Trámites educativos (próx.)</a>
+  </nav>
+  <div class="small">Servicio automatizado y <b>no oficial</b> del Estado.</div>
+</aside>
+
+<main id="contenido" class="container stack" style="padding-top:18px">
+  <section class="hero-min card">
+    <h1>Elige un trámite para empezar</h1>
+    <p class="small" style="color:var(--c-muted)">Diseño simple y claro. Tus datos viajan cifrados.</p>
+    <div class="grid-mini">
+      <article class="tile">
+        <span class="badge">Listo</span>
+        <h3 style="font-size:var(--h3);margin:0">DGT · Alegaciones / Recurso</h3>
+        <p>Documento listo con checklist y enlaces oficiales.</p>
+        <a class="btn btn-primary" href="dgt-multas.html">Abrir</a>
+      </article>
+      <article class="tile">
+        <span class="badge">En preparación</span>
+        <h3 style="font-size:var(--h3);margin:0">Herencias</h3>
+        <p>Guía y modelos básicos (en preparación).</p>
+        <a class="btn btn-secondary" href="herencias.html">Ver guía</a>
+      </article>
+      <article class="tile">
+        <span class="badge">Próximamente</span>
+        <h3 style="font-size:var(--h3);margin:0">Trámite vivienda</h3>
+        <p>Plusvalía/empadronamiento (próximamente).</p>
+        <button class="btn btn-secondary" type="button" disabled>Pronto</button>
+      </article>
+      <article class="tile">
+        <span class="badge">Próximamente</span>
+        <h3 style="font-size:var(--h3);margin:0">Trámites educativos</h3>
+        <p>Becas y certificados (próximamente).</p>
+        <button class="btn btn-secondary" type="button" disabled>Pronto</button>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container cols">
+    <div class="small">
+      <strong>Aviso:</strong> Página <b>no oficial</b> del Estado. No sustituye a profesionales
+      (abogado, gestor o administrador). <a href="privacidad.html">Privacidad</a> · <a href="cookies.html">Cookies</a>
+      · <a href="#" id="gestionCookies" class="cookie-link">Gestionar cookies</a>
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <a href="aviso-legal.html">Aviso legal</a>
+      <a href="quienes-somos.html">¿Quiénes somos?</a>
+      <a href="contacto.html">Contacto</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Banner de cookies -->
+<div id="cookieBanner" class="cookie-banner" role="dialog" aria-modal="true" aria-labelledby="ck-title" aria-describedby="ck-desc">
+  <div class="container">
+    <div>
+      <strong id="ck-title">Cookies en SGH</strong>
+      <p id="ck-desc" class="small">
+        Usamos <b>solo cookies técnicas necesarias</b> para que el sitio funcione (p. ej., recordar tu elección de cookies).
+        No usamos publicidad ni analítica por defecto. Si en el futuro activamos cookies opcionales,
+        te pediremos consentimiento de nuevo. Consulta la <a href="cookies.html" class="cookie-link">Política de cookies</a>.
+      </p>
+    </div>
+    <div class="cookie-actions">
+      <button id="ckConfig" class="btn btn-secondary" type="button">Configurar</button>
+      <button id="ckReject" class="btn btn-secondary" type="button">Rechazar opcionales</button>
+      <button id="ckAccept" class="btn btn-primary" type="button">Aceptar todas</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de cookies -->
+<div id="cookieModal" class="cookie-modal" aria-hidden="true">
+  <div class="box" role="dialog" aria-modal="true" aria-labelledby="ckm-title" aria-describedby="ckm-desc">
+    <h2 id="ckm-title" style="font-size:var(--h3);margin:0 0 6px">Preferencias de cookies</h2>
+    <p id="ckm-desc" class="small" style="color:var(--c-muted);margin:0 0 8px">
+      Puedes cambiar tu elección en cualquier momento desde “Gestionar cookies”.
+    </p>
+
+    <div class="opt">
+      <div><b>Necesarias</b><br><small>Imprescindibles para el funcionamiento básico (p. ej., recordar tu consentimiento). No requieren autorización.</small></div>
+      <div class="switch"><label>Siempre activas</label></div>
+    </div>
+
+    <div class="opt">
+      <div><b>Preferencias</b><br><small>Guardan opciones como idioma. (Actualmente <i>no</i> se usan).</small></div>
+      <div class="switch">
+        <input type="checkbox" id="ckPref">
+        <label for="ckPref">Activar</label>
+      </div>
+    </div>
+
+    <div class="opt">
+      <div><b>Medición</b><br><small>Métricas anónimas para mejorar el servicio. (Actualmente <i>no</i> se usan).</small></div>
+      <div class="switch">
+        <input type="checkbox" id="ckAnal">
+        <label for="ckAnal">Activar</label>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
+      <button id="ckCancel" class="btn btn-secondary" type="button">Cancelar</button>
+      <button id="ckSave" class="btn btn-primary" type="button">Guardar preferencias</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== Drawer accesible ===== */
+const btnMenu = document.getElementById('btnMenu');
+const btnClose = document.getElementById('btnClose');
+const drawer = document.getElementById('drawer');
+const backdrop = document.getElementById('backdrop');
+let lastFocus = null;
+
+function openDrawer(){
+  lastFocus = document.activeElement;
+  drawer.classList.remove('js-close');
+  drawer.setAttribute('aria-hidden','false');
+  backdrop.classList.add('show'); backdrop.hidden=false;
+  btnMenu.setAttribute('aria-expanded','true');
+  drawer.querySelector('a,button').focus();
+  document.addEventListener('keydown', trapDrawer);
+}
+function closeDrawer(){
+  drawer.classList.add('js-close');
+  drawer.setAttribute('aria-hidden','true');
+  backdrop.classList.remove('show'); backdrop.hidden=true;
+  btnMenu.setAttribute('aria-expanded','false');
+  document.removeEventListener('keydown', trapDrawer);
+  if(lastFocus) lastFocus.focus();
+}
+function trapDrawer(e){
+  if(e.key==='Escape'){ closeDrawer(); return; }
+  if(e.key!=='Tab') return;
+  const focusables = drawer.querySelectorAll('a[href]:not([tabindex="-1"]),button:not([disabled])');
+  if(!focusables.length) return;
+  const first=focusables[0], last=focusables[focusables.length-1];
+  if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+}
+btnMenu.addEventListener('click',()=> drawer.classList.contains('js-close') ? openDrawer() : closeDrawer());
+btnClose.addEventListener('click', closeDrawer);
+backdrop.addEventListener('click', closeDrawer);
+
+/* ===== Cookies ===== */
+const CONSENT_VERSION='v1.0';
+const CK_KEY = 'sgh_cookie_consent_v1';
+const banner = document.getElementById('cookieBanner');
+const modal  = document.getElementById('cookieModal');
+const btnCfg = document.getElementById('ckConfig');
+const btnRej = document.getElementById('ckReject');
+const btnOk  = document.getElementById('ckAccept');
+const btnSave= document.getElementById('ckSave');
+const btnCan = document.getElementById('ckCancel');
+const ckPref = document.getElementById('ckPref');
+const ckAnal = document.getElementById('ckAnal');
+const manage = document.getElementById('gestionCookies');
+
+function getConsent(){ try{ return JSON.parse(localStorage.getItem(CK_KEY)) }catch{ return null } }
+function setConsent(obj){ localStorage.setItem(CK_KEY, JSON.stringify(obj)); }
+function showBanner(){ banner.style.display='block' }
+function hideBanner(){ banner.style.display='none' }
+function lockScroll(on){ document.body.style.overflow = on ? 'hidden' : '' }
+
+function openModal(){
+  modal.style.display='block'; lockScroll(true);
+  const c=getConsent();
+  ckPref.checked=!!(c&&c.preferences); ckAnal.checked=!!(c&&c.analytics);
+  document.addEventListener('keydown', modalKeys);
+}
+function closeModal(){
+  modal.style.display='none'; lockScroll(false);
+  document.removeEventListener('keydown', modalKeys);
+}
+function modalKeys(e){ if(e.key==='Escape') closeModal(); }
+
+const existing = getConsent();
+if(!existing || existing.version!==CONSENT_VERSION){ showBanner() }
+
+btnCfg.addEventListener('click', openModal);
+btnRej.addEventListener('click', ()=>{
+  setConsent({version:CONSENT_VERSION,necessary:true,preferences:false,analytics:false,date:new Date().toISOString()});
+  hideBanner();
+});
+btnOk.addEventListener('click', ()=>{
+  setConsent({version:CONSENT_VERSION,necessary:true,preferences:true,analytics:true,date:new Date().toISOString()});
+  hideBanner();
+});
+btnSave.addEventListener('click', ()=>{
+  setConsent({version:CONSENT_VERSION,necessary:true,preferences:ckPref.checked,analytics:ckAnal.checked,date:new Date().toISOString()});
+  closeModal(); hideBanner();
+});
+btnCan.addEventListener('click', closeModal);
+manage.addEventListener('click', (e)=>{ e.preventDefault(); openModal(); });
+
+/* Nota: no cargamos scripts de preferencias/medición hasta que exista consentimiento. */
+</script>
+</body>
+</html>
