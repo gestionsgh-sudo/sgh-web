@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es-ES">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SGH | DGT · Alegaciones (20 días) / Recurso (1 mes)</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* Estilos propios de esta página (el resto viene de style.css) */
+.page-head{background:#fff;border-bottom:1px solid var(--c-border)}
+.page-head .container{display:flex;align-items:center;gap:12px;padding:12px var(--gap)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--c-text)}
+.brand-badge{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
+  color:var(--c-primary);background:color-mix(in srgb,var(--c-primary) 12%, #fff);border:1px solid var(--c-border)}
+
+.grid-2{display:grid;gap:16px}
+@media(min-width:1000px){ .grid-2{grid-template-columns:1fr 380px} }
+
+fieldset{border:1px solid var(--c-border);border-radius:14px;padding:12px;background:#fff}
+legend{font-weight:800;padding:0 6px}
+label{display:block;margin:6px 0 4px}
+input[type="text"],input[type="email"],input[type="date"],select,textarea{
+  width:100%;height:44px;border:1px solid var(--c-border);border-radius:12px;padding:0 12px;background:#fff
+}
+textarea{min-height:120px;padding:12px}
+input[type="checkbox"],input[type="radio"]{accent-color:var(--c-secondary)}
+.row-2{display:grid;gap:12px}
+@media(min-width:700px){ .row-2{grid-template-columns:1fr 1fr} }
+.help{color:var(--c-muted);font-size:14px}
+.small-muted{font-size:12px;color:var(--c-muted)}
+.hr{height:1px;background:var(--c-border);margin:10px 0}
+.notice-inline{background:color-mix(in srgb,var(--c-warning) 14%, #fff);border:1px solid var(--c-border);padding:10px;border-radius:10px}
+.deadline{background:#fff;border:1px dashed var(--c-border);border-radius:12px;padding:12px}
+.badge-soft{display:inline-block;border-radius:999px;padding:4px 10px;font-size:12px;background:color-mix(in srgb,var(--c-primary) 10%,#fff);border:1px solid var(--c-border)}
+.hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+
+<!-- barra de confianza -->
+<div class="trustbar">
+  <div class="container">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M12 3l7 3v6c0 5-3.5 9-7 9s-7-4-7-9V6l7-3z" stroke-width="1.6"/>
+      <path d="M9 12l2 2 4-4" stroke-width="1.8"/>
+    </svg>
+    <span>RGPD: datos mínimos, cifrado en tránsito, control por el usuario</span>
+  </div>
+</div>
+
+<!-- cabecera -->
+<header class="page-head">
+  <div class="container">
+    <a href="index.html" class="brand" aria-label="Inicio">
+      <div class="brand-badge">S</div><span>SGH</span>
+    </a>
+    <nav class="nav" aria-label="principal" style="margin-left:auto;display:flex;gap:14px;flex-wrap:wrap">
+      <a href="paneles.html">Trámites</a>
+      <a href="quienes-somos.html">¿Quiénes somos?</a>
+      <a href="aviso-legal.html">Legal</a>
+      <a href="contacto.html">Contacto</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container stack" style="padding:20px 0 28px">
+  <section class="grid-2">
+    <!-- ======= FORMULARIO ======= -->
+    <form id="form-dgt" class="stack" method="POST" enctype="multipart/form-data"
+          action="AQUI_TU_WEBHOOK_DGT">
+      <input type="hidden" name="form_name" value="dgt_multas">
+      <input type="hidden" name="timestamp_iso" id="ts">
+      <input type="hidden" name="source_url" id="src">
+      <input type="hidden" name="plazo_calculado" id="plazo_calculado">
+      <input type="hidden" name="plazo_detalle" id="plazo_detalle">
+      <input type="hidden" name="notificacion_efectiva" id="not_efectiva">
+      <!-- honeypot -->
+      <div class="hp"><label for="web">Si ves esto, déjalo vacío</label><input id="web" name="website"></div>
+
+      <h1 style="margin:0">DGT · Alegaciones (20 días) / Recurso (1 mes)</h1>
+      <p class="small" style="margin:0;color:var(--c-muted)">
+        Generamos tu escrito en PDF, con checklist y enlaces a Sede DGT y REG.
+      </p>
+
+      <fieldset>
+        <legend>1) Datos personales</legend>
+        <div class="row-2">
+          <div><label>Nombre *</label><input name="nombre" required></div>
+          <div><label>Apellidos *</label><input name="apellidos" required></div>
+        </div>
+        <div class="row-2">
+          <div><label>DNI/NIE/CIF *</label><input name="dni" required></div>
+          <div><label>Correo electrónico *</label><input type="email" name="email" required></div>
+        </div>
+        <label>Domicilio a efectos de notificaciones *</label>
+        <input name="domicilio" required>
+        <div class="row-2">
+          <div><label>Localidad *</label><input name="localidad" required></div>
+          <div><label>Provincia *</label><input name="provincia" required></div>
+        </div>
+        <label>Código postal *</label><input name="cp" required>
+      </fieldset>
+
+      <fieldset>
+        <legend>2) Representación</legend>
+        <div class="row-2">
+          <label class="control"><input type="radio" name="actua_como" value="interesado" checked> No actúo como representante</label>
+          <label class="control"><input type="radio" name="actua_como" value="representante"> Sí, represento a otra persona</label>
+        </div>
+        <div id="rep-box" class="stack" hidden>
+          <div class="row-2">
+            <div><label>Nombre del representado *</label><input name="rep_nombre"></div>
+            <div><label>DNI/NIE del representado *</label><input name="rep_dni"></div>
+          </div>
+          <label>Autorización de representación (PDF/JPG/PNG, máx. 10MB)</label>
+          <input type="file" name="rep_autorizacion" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>3) Expediente</legend>
+        <div class="row-2">
+          <div><label>Nº de expediente DGT *</label><input name="expediente" required></div>
+          <div><label>Matrícula *</label><input name="matricula" required></div>
+        </div>
+        <label>Tipo de trámite *</label>
+        <div class="row-2">
+          <label class="control"><input type="radio" name="tipo" value="alegaciones" checked> Alegaciones (20 días)</label>
+          <label class="control"><input type="radio" name="tipo" value="recurso"> Recurso de reposición (1 mes)</label>
+        </div>
+        <div id="fecha-resol" class="stack" hidden>
+          <label>Fecha de la resolución sancionadora (solo para Recurso)</label>
+          <input type="date" name="fecha_resolucion">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>4) Notificación</legend>
+        <label>¿Cómo recibiste la notificación? *</label>
+        <select id="canal" name="canal" required>
+          <option value="" selected>— Selecciona —</option>
+          <option>Boletín en el acto</option>
+          <option>Postal</option>
+          <option>DEV leída</option>
+          <option>DEV no leída</option>
+          <option>DEHú leída</option>
+          <option>DEHú no leída</option>
+          <option>Edictos (TEU/BOE)</option>
+        </select>
+
+        <label id="lbl-fecha">Fecha de notificación / lectura / puesta a disposición *</label>
+        <input type="date" id="fecha" name="fecha_evento" required>
+        <p class="small-muted">Te calculamos el plazo orientativo abajo. Verifica siempre tu documento de notificación.</p>
+
+        <div class="deadline" id="plazoBox" hidden>
+          <div><b>Notificación efectiva:</b> <span id="out-efectiva">—</span></div>
+          <div><b>Plazo para presentar:</b> <span id="out-plazo">—</span> <span class="badge-soft" id="out-tipo">—</span></div>
+          <div class="small-muted" id="out-detalle">—</div>
+        </div>
+
+        <div class="notice-inline small" style="margin-top:10px">
+          <b>Importante:</b> este cálculo es orientativo. La normativa puede fijar <i>días hábiles</i> o <i>naturales</i>. Revisa tu notificación y, ante duda, presenta cuanto antes.
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>5) Motivos y pruebas</legend>
+        <div class="row-2">
+          <label class="control"><input type="checkbox" name="motivos[]" value="error_identificacion"> Error de identificación/datos</label>
+          <label class="control"><input type="checkbox" name="motivos[]" value="no_conductor"> No era el conductor</label>
+          <label class="control"><input type="checkbox" name="motivos[]" value="senalizacion"> Señalización deficiente</label>
+          <label class="control"><input type="checkbox" name="motivos[]" value="instrumento"> Instrumento mal calibrado</label>
+          <label class="control"><input type="checkbox" name="motivos[]" value="prescripcion"> Prescripción/caducidad</label>
+          <label class="control"><input type="checkbox" name="motivos[]" value="circ_excepcionales"> Circunstancias excepcionales</label>
+        </div>
+        <label>Expón brevemente tus hechos y fundamentos (máx. 2000 caracteres)</label>
+        <textarea name="relato" maxlength="2000" placeholder="Describe de forma clara y breve los hechos y por qué solicitas la estimación."></textarea>
+
+        <label>Pruebas/archivos (PDF/JPG/PNG, máx. 10MB cada uno) <span class="help">(opcional, puedes añadir varias)</span></label>
+        <input type="file" name="archivos[]" accept=".pdf,.jpg,.jpeg,.png" multiple>
+      </fieldset>
+
+      <fieldset>
+        <legend>6) Confirmación</legend>
+        <label class="control"><input type="checkbox" name="veracidad" required> Declaro que la información enviada es veraz y los documentos son auténticos.</label>
+        <label class="control"><input type="checkbox" name="consentimiento" required> Acepto el uso de mis datos para generar y enviarme el documento.</label>
+        <p class="small-muted">
+          Aviso: Servicio automatizado y <b>no oficial</b> del Estado. No sustituye a profesionales (abogado, gestor o administrador). Enlaces oficiales: 
+          <a href="https://sede.dgt.gob.es" target="_blank" rel="noopener">Sede DGT</a> · 
+          <a href="https://rec.redsara.es" target="_blank" rel="noopener">Registro Electrónico General</a>.
+        </p>
+      </fieldset>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button id="btnSend" class="btn btn-primary" type="submit">Generar documento</button>
+        <a class="btn btn-secondary" href="paneles.html">Volver al panel</a>
+      </div>
+      <p id="status" class="small-muted" role="status" aria-live="polite"></p>
+    </form>
+
+    <!-- ======= LATERAL ======= -->
+    <aside class="stack">
+      <section class="card">
+        <h2 style="font-size:20px;margin:0 0 6px">Checklist</h2>
+        <ul class="small" style="margin:0 0 6px;padding-left:18px">
+          <li>Verifica el plazo (fecha de notificación y canal).</li>
+          <li>Adjunta autorización si actúas como representante.</li>
+          <li>Revisa matrícula, expediente y DNI/NIE.</li>
+          <li>Ten tu certificado digital o Cl@ve para la Sede.</li>
+        </ul>
+        <div class="hr"></div>
+        <a class="btn btn-ghost" href="https://sede.dgt.gob.es" target="_blank" rel="noopener">Ir a Sede DGT →</a>
+        <a class="btn btn-ghost" href="https://rec.redsara.es" target="_blank" rel="noopener">Ir a REG →</a>
+      </section>
+
+      <section class="notice">
+        <b>Transparencia:</b> Este asistente genera un borrador. Léelo antes de firmarlo y presentarlo.
+      </section>
+    </aside>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container cols">
+    <div class="small">© SGH – Datos mínimos, sin publicidad ni seguimiento.</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <a href="aviso-legal.html">Aviso legal</a>
+      <a href="privacidad.html">Privacidad</a>
+      <a href="cookies.html">Cookies</a>
+      <a href="contacto.html">Contacto</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* completar hidden y UI */
+document.getElementById('ts').value = new Date().toISOString();
+document.getElementById('src').value = location.href;
+
+/* representación */
+const radiosRep = document.querySelectorAll('input[name="actua_como"]');
+const repBox = document.getElementById('rep-box');
+function toggleRep(){ repBox.hidden = !document.querySelector('input[name="actua_como"][value="representante"]').checked; }
+radiosRep.forEach(r=>r.addEventListener('change',toggleRep)); toggleRep();
+
+/* tipo trámite fecha resolución */
+const tipoRad = document.querySelectorAll('input[name="tipo"]');
+const fechaRes = document.getElementById('fecha-resol');
+function toggleRes(){ fechaRes.hidden = document.querySelector('input[name="tipo"][value="recurso"]').checked ? false : true; }
+tipoRad.forEach(r=>r.addEventListener('change',()=>{toggleRes(); calcPlazo();}));
+toggleRes();
+
+/* cálculo de plazos (orientativo) */
+const canal = document.getElementById('canal');
+const fecha = document.getElementById('fecha');
+const outEfectiva = document.getElementById('out-efectiva');
+const outPlazo = document.getElementById('out-plazo');
+const outTipo = document.getElementById('out-tipo');
+const outDetalle = document.getElementById('out-detalle');
+const plazoBox = document.getElementById('plazoBox');
+const notEf = document.getElementById('not_efectiva');
+const plazoCalc = document.getElementById('plazo_calculado');
+const plazoDet = document.getElementById('plazo_detalle');
+
+function parse(d){ const t = new Date(d); if(isNaN(t)) return null; t.setHours(12,0,0,0); return t; }
+function fmt(d){ return d ? d.toLocaleDateString('es-ES') : '—'; }
+function addDays(d,n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+function addBusinessDays(d,n){
+  let x=new Date(d), added=0;
+  while(added<n){ x.setDate(x.getDate()+1); const wd=x.getDay(); if(wd!==0 && wd!==6) added++; }
+  return x;
+}
+function addMonthsSameDay(d,months){
+  const x=new Date(d); const day=x.getDate();
+  x.setMonth(x.getMonth()+months);
+  if(x.getDate()!==day){ x.setDate(0); } // último día del mes si no existe
+  return x;
+}
+
+function calcPlazo(){
+  const c = canal.value;
+  const f = parse(fecha.value);
+  const esRecurso = document.querySelector('input[name="tipo"][value="recurso"]').checked;
+  const fResol = parse(document.querySelector('input[name="fecha_resolucion"]')?.value);
+
+  if(!c || !f){ plazoBox.hidden=true; return; }
+
+  let notifEf = f; // notificación efectiva
+  let detalle = [];
+  if(c==='DEV no leída' || c==='DEHú no leída'){
+    notifEf = addDays(f,10); // regla 10 días
+    detalle.push('DEV/DEHú no leída: se entiende notificado al décimo día natural desde la puesta a disposición.');
+  }else if(c==='DEV leída' || c==='DEHú leída'){
+    detalle.push('DEV/DEHú leída: se cuenta desde la fecha de acceso/lectura.');
+  }else if(c==='Boletín en el acto'){
+    detalle.push('Boletín en el acto: se cuenta desde el día siguiente.');
+  }else if(c==='Postal'){
+    detalle.push('Postal: desde la recepción indicada en el aviso.');
+  }else if(c==='Edictos (TEU/BOE)'){
+    detalle.push('Edictos: desde la publicación indicada.');
+  }
+
+  let plazoFin, etiqueta;
+  if(esRecurso){
+    // Recurso de reposición: 1 mes desde la notificación de la resolución sancionadora
+    const base = fResol || notifEf;
+    plazoFin = addMonthsSameDay(base,1);
+    etiqueta = '1 mes (resolución)';
+    detalle.push('Recurso: 1 mes desde la notificación de la resolución sancionadora.');
+  }else{
+    // Alegaciones: mostramos dos referencias (naturales y hábiles) por seguridad
+    const finNat = addDays(notifEf,20);
+    const finHab = addBusinessDays(notifEf,20);
+    plazoFin = finNat; // mostramos naturales como principal
+    etiqueta = '20 días';
+    detalle.push(`Alegaciones: 20 días. Naturales: ${fmt(finNat)} · Hábiles aprox.: ${fmt(finHab)}.`);
+  }
+
+  outEfectiva.textContent = fmt(notifEf);
+  outPlazo.textContent = fmt(plazoFin);
+  outTipo.textContent = etiqueta;
+  outDetalle.textContent = detalle.join(' ');
+  plazoBox.hidden = false;
+
+  // enviar al webhook
+  notEf.value = notifEf.toISOString();
+  plazoCalc.value = plazoFin.toISOString();
+  plazoDet.value = outDetalle.textContent;
+}
+canal.addEventListener('change', calcPlazo);
+fecha.addEventListener('change', calcPlazo);
+document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('change', calcPlazo);
+
+/* UX envío */
+const form = document.getElementById('form-dgt');
+const statusEl = document.getElementById('status');
+const btn = document.getElementById('btnSend');
+form.addEventListener('submit', (e)=>{
+  if(document.getElementById('web').value){ e.preventDefault(); return; } // bot
+  btn.disabled = true; btn.textContent = 'Enviando…'; statusEl.textContent='Enviando…';
+});
+</script>
+</body>
+</html>
