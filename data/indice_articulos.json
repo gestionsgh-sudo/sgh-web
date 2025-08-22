@@ -1,0 +1,18 @@
+{
+  "LPACAP": {
+    "16":      { "titulo": "Presentación de escritos",                      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/LPACAP.pdf#page=25" },
+    "41.1":    { "titulo": "Inicio de plazo desde la lectura",              "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/LPACAP.pdf#page=36" },
+    "41.5":    { "titulo": "DEV/DEHú no leída: notificada a los 10 días",   "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/LPACAP.pdf#page=37" },
+    "123-124": { "titulo": "Recurso de reposición (plazo 1 mes)",           "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/LPACAP.pdf#page=80" }
+  },
+  "RD203": {
+    "42":      { "titulo": "Puesta a disposición en DEHú",                   "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/Real.Decreto.203.pdf#page=22" }
+  },
+  "RGC": {
+    "134":     { "titulo": "Catálogo de señales",                            "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/REGLAMENTO.GENERAL.CIRCULACION.pdf#page=120" },
+    "138":     { "titulo": "Idioma de las señales",                          "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/REGLAMENTO.GENERAL.CIRCULACION.pdf#page=130" }
+  },
+  "LSV": {
+    "83-90":   { "titulo": "Procedimiento sancionador / metrología",         "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/METROLOGIA.LEGAL.pdf#page=1" }
+  }
+}
