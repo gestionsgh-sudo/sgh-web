@@ -62,7 +62,16 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--c-secondary)}
     </nav>
   </div>
 </header>
-
+<section id="pdf-panel" class="card" hidden>
+  <h2 style="margin:0 0 10px">Documento generado</h2>
+  <div style="display:flex;gap:10px;margin:8px 0 12px">
+    <button id="btnDescargar" class="btn btn-primary" type="button">Descargar PDF</button>
+    <button id="btnCompartir" class="btn btn-ghost" type="button">Compartir…</button>
+  </div>
+  <iframe id="pdfFrame"
+          style="width:100%;height:70vh;border:1px solid var(--c-border);border-radius:10px;background:#fff">
+  </iframe>
+</section>
 <main class="container stack" style="padding:20px 0 28px">
   <section class="grid-2">
     <!-- ======= FORMULARIO ======= -->
@@ -342,3 +351,88 @@ form.addEventListener('submit', (e)=>{
 </script>
 </body>
 </html>
+<script>
+// === Visor y acciones ===
+const pdfPanel = document.getElementById('pdf-panel');
+const pdfFrame = document.getElementById('pdfFrame');
+const btnDescargar = document.getElementById('btnDescargar');
+const btnCompartir = document.getElementById('btnCompartir');
+
+let lastBlobUrl = null;
+let lastBlob = null;
+
+// Reemplazamos el submit normal por fetch para poder leer el PDF
+form.addEventListener('submit', async (e) => {
+  // anti-bots (honeypot)
+  if (document.getElementById('web').value) { e.preventDefault(); return; }
+
+  // interceptamos para manejar la respuesta
+  e.preventDefault();
+
+  btn.disabled = true;
+  btn.textContent = 'Generando…';
+  statusEl.textContent = 'Generando documento…';
+
+  try {
+    const fd = new FormData(form);
+    const res = await fetch(form.action, { method: 'POST', body: fd });
+
+    // la respuesta debe ser 200 y application/pdf
+    if (!res.ok) throw new Error('Respuesta inválida (' + res.status + ')');
+
+    const ct = (res.headers.get('Content-Type') || '').toLowerCase();
+    if (!ct.includes('pdf')) {
+      // si ves aquí algo como text/html o application/json,
+      // revisa el Webhook response en Make (headers y Body).
+      throw new Error('La respuesta no es un PDF (Content-Type = ' + ct + ')');
+    }
+
+    const blob = await res.blob();
+    lastBlob = blob;
+
+    if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
+    lastBlobUrl = URL.createObjectURL(blob);
+
+    pdfFrame.src = lastBlobUrl;
+    pdfPanel.hidden = false;
+
+    // Descargar
+    btnDescargar.onclick = () => {
+      const a = document.createElement('a');
+      a.href = lastBlobUrl;
+      a.download = 'Plantilla_DGT.pdf';
+      a.click();
+    };
+
+    // Compartir (móvil/desktop moderno) con Web Share API
+    btnCompartir.onclick = async () => {
+      try {
+        const file = new File([blob], 'Plantilla_DGT.pdf', { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'SGH · Documento DGT',
+            text: 'Te envío mi borrador en PDF.',
+            files: [file]
+          });
+        } else {
+          // fallback sencillo: WhatsApp con texto (no adjunta, pero abre chat)
+          const txt = encodeURIComponent('He generado mi borrador en PDF. Lo descargo y te lo adjunto.');
+          window.open('https://wa.me/?text=' + txt, '_blank');
+        }
+      } catch (err) {
+        alert('No se pudo compartir: ' + err.message);
+      }
+    };
+
+    statusEl.textContent = 'Documento listo. Revísalo y descárgalo.';
+  } catch (err) {
+    console.error(err);
+    alert('No se pudo generar el PDF: ' + err.message);
+    statusEl.textContent = 'Error al generar el PDF.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Generar documento';
+  }
+});
+</script>
+
