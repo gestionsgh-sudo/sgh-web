@@ -1,0 +1,12 @@
+{
+  "TEXTO_WEB": {
+    "Ejemplo_Usuario": {
+      "titulo": "Ejemplo usuario (guía)",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/EJEMPLO.USUARIO.pdf"
+    },
+    "Texto_Web": {
+      "titulo": "Texto web (copys)",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/TEXTO.WEB.pdf"
+    }
+  }
+}
