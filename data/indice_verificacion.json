@@ -1,0 +1,36 @@
+{
+  "VERIFICACION": {
+    "Prompt_BAS1": {
+      "titulo": "PROMPT BAS1",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/PROMPT.BAS1.pdf"
+    },
+    "Prompt_Calculador_Plazos": {
+      "titulo": "PROMPT Calculador de Plazos",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/PROMPT.CALCULADOR.DE.PLAZOS.pdf"
+    },
+    "Prompt_Extractor_Hechos": {
+      "titulo": "PROMPT Extractor de Hechos",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/PROMPT.EXTRACTOR.DE.HECHOS.pdf"
+    },
+    "Prompt_Generador_Anexos": {
+      "titulo": "PROMPT Generador de Anexos",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/PROMPT.GENERADOR.DE.ANEXOS.pdf"
+    },
+    "Prompt_Pie_Legal": {
+      "titulo": "PROMPT Pie Legal",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/PROMPT.PIE.LEGAL.pdf"
+    },
+    "Prompt_Verificador_Legislacion": {
+      "titulo": "PROMPT Verificador de Legislación",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/PROMPT.VERIFICADOR.DE.LEGISLACION.pdf"
+    },
+    "Tabla_Reglas": {
+      "titulo": "Tabla de Reglas",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/TABLA.REGLAS.pdf"
+    },
+    "Test_Casos_Limite": {
+      "titulo": "Test de Casos Límite",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/TEST.CASOS.LIMITE.pdf"
+    }
+  }
+}
