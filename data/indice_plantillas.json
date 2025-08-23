@@ -1,0 +1,24 @@
+{
+  "PLANTILLAS": {
+    "Alegaciones": {
+      "titulo": "Plantilla de Alegaciones",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/ALEGACIONES.pdf"
+    },
+    "Pronto_Pago": {
+      "titulo": "Justificante de Pronto Pago — Plantilla",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/Justificante.de.Pronto.Pago.-.PLANTILLA.pdf"
+    },
+    "Modulos": {
+      "titulo": "Módulos",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/Modulos.pdf"
+    },
+    "Recurso_Reposicion": {
+      "titulo": "Recurso de Reposición",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/RECURSO.DE.REPOSICION.pdf"
+    },
+    "Acceso_Expediente": {
+      "titulo": "Solicitud de Acceso al Expediente",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/Solicitud.de.Acceso.al.Expediente.pdf"
+    }
+  }
+}
