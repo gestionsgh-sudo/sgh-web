@@ -1,0 +1,32 @@
+{
+  "FUENTES": {
+    "BOE_2024_26935": {
+      "titulo": "BOE-A-2024-26935 (cómputo de días inhábiles)",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/BOE-A-2024-26935.dia.inhabiles.pdf"
+    },
+    "Calendario_AGE_2025": {
+      "titulo": "Calendario de días inhábiles AGE 2025",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/calendario_dias_inhabiles_AGE_2025.-.copia.pdf"
+    },
+    "Carta_Obligatoriedad_DEV_PJ": {
+      "titulo": "Carta de obligatoriedad DEV (personas jurídicas)",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/CARTA-OBLIGATORIEDAD-DEV-PJ.pdf"
+    },
+    "Documento_Revocacion_DEV": {
+      "titulo": "Documento de revocación DEV",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/DocumentoRevocacionDEV.pdf"
+    },
+    "Impreso_ALEG_RECURSO": {
+      "titulo": "Impreso oficial: Alegación o Recurso",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/impreso_ALEG-RECURSO.pdf"
+    },
+    "Mod_24_ES_Apoderamientos": {
+      "titulo": "Modelo 24-ES (Registro de Apoderamientos)",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/Mod.24-ES.Registro.Apoderamientos.pdf"
+    },
+    "Guia_Presentacion_Alegacion": {
+      "titulo": "Guía: Presentación de alegación o recurso a una multa",
+      "pdf": "https://github.com/gestionsgh-sudo/sgh-web/releases/latest/download/Presentacion.de.alegacion.o.recurso.a.una.multa.pdf"
+    }
+  }
+}
