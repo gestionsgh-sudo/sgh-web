@@ -349,90 +349,122 @@ form.addEventListener('submit', (e)=>{
   btn.disabled = true; btn.textContent = 'Enviando…'; statusEl.textContent='Enviando…';
 });
 </script>
-</body>
-</html>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <script>
-// === Visor y acciones ===
-const pdfPanel = document.getElementById('pdf-panel');
-const pdfFrame = document.getElementById('pdfFrame');
-const btnDescargar = document.getElementById('btnDescargar');
-const btnCompartir = document.getElementById('btnCompartir');
+(() => {
+  // Tus elementos (ya existen en tu HTML)
+  const form     = document.getElementById('form-dgt');   // <form ... id="form-dgt">
+  const btn      = document.getElementById('btnSend');
+  const statusEl = document.getElementById('status');
 
-let lastBlobUrl = null;
-let lastBlob = null;
+  const pdfPanel = document.getElementById('pdf-panel');
+  const pdfFrame = document.getElementById('pdfFrame');
+  const btnDesc  = document.getElementById('btnDescargar');
+  const btnShare = document.getElementById('btnCompartir');
 
-// Reemplazamos el submit normal por fetch para poder leer el PDF
-form.addEventListener('submit', async (e) => {
-  // anti-bots (honeypot)
-  if (document.getElementById('web').value) { e.preventDefault(); return; }
+  if (!form) return;
 
-  // interceptamos para manejar la respuesta
-  e.preventDefault();
+  // Usamos la URL que ya pusiste en action del form (tu webhook de Make)
+  const WEBHOOK_URL = form.action;
 
-  btn.disabled = true;
-  btn.textContent = 'Generando…';
-  statusEl.textContent = 'Generando documento…';
+  // Contenedor invisible: aquí pegamos el HTML que devuelve Make para convertirlo a PDF
+  const container = document.createElement('div');
+  container.id = 'docHtmlContainer';
+  container.style.position = 'fixed';
+  container.style.left = '-10000px';
+  container.style.top = '0';
+  container.style.width = '210mm'; // A4
+  document.body.appendChild(container);
 
-  try {
-    const fd = new FormData(form);
-    const res = await fetch(form.action, { method: 'POST', body: fd });
+  let lastBlob = null;
+  let lastUrl  = null;
 
-    // la respuesta debe ser 200 y application/pdf
-    if (!res.ok) throw new Error('Respuesta inválida (' + res.status + ')');
+  function setBusy(on){
+    if (btn){ btn.disabled = on; btn.textContent = on ? 'Generando…' : 'Generar documento'; }
+    if (statusEl){ statusEl.textContent = on ? 'Generando documento…' : ''; }
+  }
 
-    const ct = (res.headers.get('Content-Type') || '').toLowerCase();
-    if (!ct.includes('pdf')) {
-      // si ves aquí algo como text/html o application/json,
-      // revisa el Webhook response en Make (headers y Body).
-      throw new Error('La respuesta no es un PDF (Content-Type = ' + ct + ')');
-    }
+  async function htmlToPdfBlob(html){
+    container.innerHTML = html;
+    const opt = {
+      margin: [10,10,14,10],               // mm
+      filename: 'alegacion-dgt.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    const worker = html2pdf().set(opt).from(container).toPdf();
+    const pdf = await worker.get('pdf');
+    return pdf.output('blob'); // ← Blob del PDF
+  }
 
-    const blob = await res.blob();
+  function showPdf(blob){
+    if (lastUrl) URL.revokeObjectURL(lastUrl);
     lastBlob = blob;
+    lastUrl  = URL.createObjectURL(blob);
 
-    if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
-    lastBlobUrl = URL.createObjectURL(blob);
-
-    pdfFrame.src = lastBlobUrl;
+    pdfFrame.src = lastUrl;
     pdfPanel.hidden = false;
 
     // Descargar
-    btnDescargar.onclick = () => {
+    btnDesc.onclick = () => {
       const a = document.createElement('a');
-      a.href = lastBlobUrl;
-      a.download = 'Plantilla_DGT.pdf';
+      a.href = lastUrl;
+      a.download = 'alegacion-dgt.pdf';
       a.click();
     };
 
-    // Compartir (móvil/desktop moderno) con Web Share API
-    btnCompartir.onclick = async () => {
+    // Compartir (Web Share API + fallback WhatsApp)
+    btnShare.onclick = async () => {
       try {
-        const file = new File([blob], 'Plantilla_DGT.pdf', { type: 'application/pdf' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: 'SGH · Documento DGT',
-            text: 'Te envío mi borrador en PDF.',
-            files: [file]
-          });
+        const file = new File([blob], 'alegacion-dgt.pdf', { type:'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files:[file] })) {
+          await navigator.share({ title:'SGH · Documento DGT', text:'Te envío mi borrador en PDF.', files:[file] });
         } else {
-          // fallback sencillo: WhatsApp con texto (no adjunta, pero abre chat)
-          const txt = encodeURIComponent('He generado mi borrador en PDF. Lo descargo y te lo adjunto.');
-          window.open('https://wa.me/?text=' + txt, '_blank');
+          const txt = 'He generado mi borrador en PDF. Lo descargo y te lo adjunto.';
+          window.open('https://wa.me/?text='+encodeURIComponent(txt), '_blank');
         }
-      } catch (err) {
-        alert('No se pudo compartir: ' + err.message);
+      } catch (e) {
+        alert('No se pudo compartir: ' + (e?.message || e));
       }
     };
-
-    statusEl.textContent = 'Documento listo. Revísalo y descárgalo.';
-  } catch (err) {
-    console.error(err);
-    alert('No se pudo generar el PDF: ' + err.message);
-    statusEl.textContent = 'Error al generar el PDF.';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Generar documento';
   }
-});
-</script>
 
+  // Enviar el formulario → Make responde { ok:true, html:"<html>..." }
+  form.addEventListener('submit', async (e) => {
+    // anti-bots (honeypot). Si está relleno, parar.
+    if (document.getElementById('web')?.value) { e.preventDefault(); return; }
+
+    e.preventDefault(); // no navegamos
+    setBusy(true);
+
+    try {
+      const fd  = new FormData(form);
+      const res = await fetch(WEBHOOK_URL, { method:'POST', body: fd });
+
+      if (!res.ok) {
+        const txt = await res.text().catch(()=> '');
+        throw new Error('HTTP ' + res.status + ' ' + txt);
+      }
+
+      const data = await res.json().catch(()=> ({}));
+      if (!data || !data.ok || !data.html) {
+        throw new Error('La respuesta no trae { ok:true, html }');
+      }
+
+      const blob = await htmlToPdfBlob(data.html);
+      showPdf(blob);
+      if (statusEl) statusEl.textContent = 'Documento listo. Revísalo y descárgalo.';
+    } catch (err) {
+      console.error(err);
+      alert('No se pudo generar el PDF.\n\n' + (err?.message || err));
+      if (statusEl) statusEl.textContent = 'Error al generar el PDF.';
+    } finally {
+      setBusy(false);
+    }
+  });
+})();
+</script>
+</body>
+</html>
+<script>
