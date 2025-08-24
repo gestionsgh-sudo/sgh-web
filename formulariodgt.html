@@ -313,15 +313,14 @@ document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('chan
 
   const WEBHOOK_URL = form.action;
 
-  // IFRAME oculto (visible para render), método más estable con html2pdf
+  // IFRAME oculto (visible para render). Nada de opacity:0 ni display:none.
   const iframe = document.createElement('iframe');
-  iframe.style.position='fixed';
-  iframe.style.left='-10000px';
-  iframe.style.top='0';
-  iframe.style.width='210mm';
-  iframe.style.minHeight='297mm';
-  iframe.style.opacity='0';
-  iframe.style.pointerEvents='none';
+  iframe.style.position   = 'fixed';
+  iframe.style.left       = '-10000px';
+  iframe.style.top        = '0';
+  iframe.style.width      = '210mm';
+  iframe.style.minHeight  = '297mm';
+  iframe.style.pointerEvents = 'none';
   document.body.appendChild(iframe);
 
   let lastUrl = null;
@@ -336,15 +335,12 @@ document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('chan
     const html = String(htmlString || '');
     if (!html.trim()) throw new Error('El HTML está vacío (revisa mapeo en Make).');
 
-    // Cargamos el HTML en el IFRAME con srcdoc (sin CORS)
+    // Cargamos el HTML en el IFRAME con srcdoc (sin CORS) y esperamos
     iframe.srcdoc = html;
-
-    // Esperamos a que el documento del iframe esté listo
     await new Promise((resolve) => {
-      const done = () => resolve();
+      const done = () => setTimeout(resolve, 80); // pequeño margen para estilo/reflow
       iframe.onload = done;
-      // por si onload no dispara (algún navegador), un pequeño fallback:
-      setTimeout(done, 200);
+      setTimeout(done, 250); // fallback
     });
 
     const doc = iframe.contentDocument || iframe.contentWindow?.document;
@@ -358,7 +354,14 @@ document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('chan
       margin: [10,10,14,10],
       filename: 'alegacion-dgt.pdf',
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        windowWidth: 794,   // ~A4 a 96dpi
+        windowHeight: 1123
+      },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
@@ -372,11 +375,11 @@ document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('chan
     if (lastUrl) URL.revokeObjectURL(lastUrl);
     lastUrl = URL.createObjectURL(blob);
 
-    // Abrimos en la pestaña pre-creada
+    // Abrimos en la pestaña pre-creada (evita bloqueos)
     if (win && !win.closed) win.location = lastUrl;
     else window.open(lastUrl, '_blank');
 
-    // Opcional: mostrar panel con iframe y botones
+    // Panel con visor y botones (opcional)
     if (pdfPanel) { pdfPanel.hidden = false; if (pdfFrame) pdfFrame.src = lastUrl; }
 
     if (btnDesc) btnDesc.onclick = () => {
