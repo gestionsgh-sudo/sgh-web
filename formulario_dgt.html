@@ -12,10 +12,8 @@
 .brand{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--c-text)}
 .brand-badge{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
   color:var(--c-primary);background:color-mix(in srgb,var(--c-primary) 12%, #fff);border:1px solid var(--c-border)}
-
 .grid-2{display:grid;gap:16px}
 @media(min-width:1000px){ .grid-2{grid-template-columns:1fr 380px} }
-
 fieldset{border:1px solid var(--c-border);border-radius:14px;padding:12px;background:#fff}
 legend{font-weight:800;padding:0 6px}
 label{display:block;margin:6px 0 4px}
@@ -90,9 +88,7 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--c-secondary)}
       <div class="hp"><label for="web">Si ves esto, déjalo vacío</label><input id="web" name="website"></div>
 
       <h1 style="margin:0">DGT · Alegaciones (20 días) / Recurso (1 mes)</h1>
-      <p class="small" style="margin:0;color:var(--c-muted)">
-        Generamos tu escrito en PDF, con checklist y enlaces a Sede DGT y REG.
-      </p>
+      <p class="small" style="margin:0;color:var(--c-muted)">Generamos tu escrito en PDF, con checklist y enlaces a Sede DGT y REG.</p>
 
       <fieldset>
         <legend>1) Datos personales</legend>
@@ -244,18 +240,21 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--c-secondary)}
   </div>
 </footer>
 
-<!-- === Script de UI (fechas/plazos/ocultar/mostrar) === -->
+<!-- === UI (fechas/plazos) === -->
 <script>
 document.getElementById('ts').value = new Date().toISOString();
 document.getElementById('src').value = location.href;
+
 /* representación */
 const repBox = document.getElementById('rep-box');
 function toggleRep(){ repBox.hidden = !document.querySelector('input[name="actua_como"][value="representante"]').checked; }
 document.querySelectorAll('input[name="actua_como"]').forEach(r=>r.addEventListener('change',toggleRep)); toggleRep();
+
 /* tipo trámite fecha resolución */
 const fechaRes = document.getElementById('fecha-resol');
 function toggleRes(){ fechaRes.hidden = document.querySelector('input[name="tipo"][value="recurso"]').checked ? false : true; }
 document.querySelectorAll('input[name="tipo"]').forEach(r=>r.addEventListener('change',()=>{toggleRes(); calcPlazo();})); toggleRes();
+
 /* cálculo de plazos (orientativo) */
 const canal = document.getElementById('canal');
 const fecha = document.getElementById('fecha');
@@ -294,10 +293,10 @@ fecha.addEventListener('change', calcPlazo);
 document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('change', calcPlazo);
 </script>
 
-<!-- PASO 1: librería de PDF -->
+<!-- PASO 1: librería de PDF (antes de nuestro script) -->
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 
-<!-- PASO 2 y PASO 3: envío → Make → generar PDF y abrir en pestaña nueva -->
+<!-- PASO 2/3: envío → Make → render fiable en iframe → PDF en pestaña nueva -->
 <script>
 (() => {
   'use strict';
@@ -313,14 +312,15 @@ document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('chan
 
   const WEBHOOK_URL = form.action;
 
-  // IFRAME oculto (visible para render). Nada de opacity:0 ni display:none.
+  // IFRAME off-screen; no display:none para que se renderice de verdad
   const iframe = document.createElement('iframe');
-  iframe.style.position   = 'fixed';
-  iframe.style.left       = '-10000px';
-  iframe.style.top        = '0';
-  iframe.style.width      = '210mm';
-  iframe.style.minHeight  = '297mm';
-  iframe.style.pointerEvents = 'none';
+  iframe.style.position='fixed';
+  iframe.style.left='-10000px';
+  iframe.style.top='0';
+  iframe.style.width='210mm';
+  iframe.style.minHeight='297mm';
+  iframe.style.pointerEvents='none';
+  iframe.style.background='#fff';
   document.body.appendChild(iframe);
 
   let lastUrl = null;
@@ -331,23 +331,42 @@ document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('chan
     if (statusEl){ statusEl.textContent = on ? 'Generando documento…' : ''; }
   };
 
+  // Espera a que el documento del iframe esté realmente pintado
+  async function waitForRender(doc){
+    try { if (doc.fonts && doc.fonts.ready) await doc.fonts.ready; } catch {}
+    // Esperar imágenes
+    const imgs = Array.from(doc.images || []);
+    await Promise.all(imgs.map(img => img.complete ? null : new Promise(res => { img.onload=img.onerror=res; })));
+    // 2 frames de margen
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  }
+
   async function htmlToPdfBlob(htmlString){
     const html = String(htmlString || '');
     if (!html.trim()) throw new Error('El HTML está vacío (revisa mapeo en Make).');
 
-    // Cargamos el HTML en el IFRAME con srcdoc (sin CORS) y esperamos
+    // Inyectamos el HTML en el iframe (misma-origen via srcdoc)
     iframe.srcdoc = html;
+
+    // Espera a cargar + renderizar
     await new Promise((resolve) => {
-      const done = () => setTimeout(resolve, 80); // pequeño margen para estilo/reflow
+      const done = () => resolve();
       iframe.onload = done;
       setTimeout(done, 250); // fallback
     });
 
     const doc = iframe.contentDocument || iframe.contentWindow?.document;
-    const target = doc?.body || doc?.documentElement;
+    if (!doc) throw new Error('No se pudo acceder al documento del iframe.');
+    // Asegurar fondo y color por si el HTML no los define
+    const fix = doc.createElement('style');
+    fix.textContent = 'html,body{background:#fff!important;color:#111!important;}';
+    doc.head.appendChild(fix);
 
+    await waitForRender(doc);
+
+    const target = doc.body || doc.documentElement;
     if (!target || !target.innerText.trim()) {
-      throw new Error('El HTML no se pintó en el iframe (revisa doc_html).');
+      throw new Error('El HTML no se pintó en el iframe (doc_html vacío o con display:none).');
     }
 
     const opt = {
@@ -359,14 +378,15 @@ document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('chan
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        windowWidth: 794,   // ~A4 a 96dpi
-        windowHeight: 1123
+        windowWidth: Math.max(target.scrollWidth, 800),
+        windowHeight: Math.max(target.scrollHeight, 1200),
+        letterRendering: true
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    // Cadena estable: from(element) → toPdf() → get('pdf') → output('blob')
-    const worker = html2pdf().set(opt).from(target).toPdf();
+    // Cadena robusta: canvas primero, luego PDF
+    const worker = html2pdf().set(opt).from(target).toCanvas().toPdf();
     const pdf = await worker.get('pdf');
     return pdf.output('blob');
   }
@@ -375,12 +395,13 @@ document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('chan
     if (lastUrl) URL.revokeObjectURL(lastUrl);
     lastUrl = URL.createObjectURL(blob);
 
-    // Abrimos en la pestaña pre-creada (evita bloqueos)
     if (win && !win.closed) win.location = lastUrl;
     else window.open(lastUrl, '_blank');
 
-    // Panel con visor y botones (opcional)
-    if (pdfPanel) { pdfPanel.hidden = false; if (pdfFrame) pdfFrame.src = lastUrl; }
+    if (pdfPanel) {
+      pdfPanel.hidden = false;
+      if (pdfFrame) pdfFrame.src = lastUrl;
+    }
 
     if (btnDesc) btnDesc.onclick = () => {
       const a = document.createElement('a');
@@ -407,7 +428,7 @@ document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('chan
     e.preventDefault();
     setBusy(true);
 
-    // Abre ya una pestaña en blanco para no ser bloqueado
+    // Pre-abrir pestaña para evitar bloqueos
     pendingWin = window.open('about:blank', '_blank');
 
     try {
@@ -440,6 +461,5 @@ document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('chan
   });
 })();
 </script>
-
 </body>
 </html>
