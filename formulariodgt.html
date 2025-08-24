@@ -62,6 +62,8 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--c-secondary)}
     </nav>
   </div>
 </header>
+
+<!-- PANEL (lo dejamos oculto; lo mostraremos para botones si quieres) -->
 <section id="pdf-panel" class="card" hidden>
   <h2 style="margin:0 0 10px">Documento generado</h2>
   <div style="display:flex;gap:10px;margin:8px 0 12px">
@@ -72,6 +74,7 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--c-secondary)}
           style="width:100%;height:70vh;border:1px solid var(--c-border);border-radius:10px;background:#fff">
   </iframe>
 </section>
+
 <main class="container stack" style="padding:20px 0 28px">
   <section class="grid-2">
     <!-- ======= FORMULARIO ======= -->
@@ -241,8 +244,8 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--c-secondary)}
   </div>
 </footer>
 
+<!-- === Script de UI (fechas/plazos/ocultar/mostrar) === -->
 <script>
-/* completar hidden y UI */
 document.getElementById('ts').value = new Date().toISOString();
 document.getElementById('src').value = location.href;
 
@@ -282,7 +285,7 @@ function addBusinessDays(d,n){
 function addMonthsSameDay(d,months){
   const x=new Date(d); const day=x.getDate();
   x.setMonth(x.getMonth()+months);
-  if(x.getDate()!==day){ x.setDate(0); } // último día del mes si no existe
+  if(x.getDate()!==day){ x.setDate(0); }
   return x;
 }
 
@@ -291,39 +294,18 @@ function calcPlazo(){
   const f = parse(fecha.value);
   const esRecurso = document.querySelector('input[name="tipo"][value="recurso"]').checked;
   const fResol = parse(document.querySelector('input[name="fecha_resolucion"]')?.value);
-
   if(!c || !f){ plazoBox.hidden=true; return; }
 
-  let notifEf = f; // notificación efectiva
-  let detalle = [];
-  if(c==='DEV no leída' || c==='DEHú no leída'){
-    notifEf = addDays(f,10); // regla 10 días
-    detalle.push('DEV/DEHú no leída: se entiende notificado al décimo día natural desde la puesta a disposición.');
-  }else if(c==='DEV leída' || c==='DEHú leída'){
-    detalle.push('DEV/DEHú leída: se cuenta desde la fecha de acceso/lectura.');
-  }else if(c==='Boletín en el acto'){
-    detalle.push('Boletín en el acto: se cuenta desde el día siguiente.');
-  }else if(c==='Postal'){
-    detalle.push('Postal: desde la recepción indicada en el aviso.');
-  }else if(c==='Edictos (TEU/BOE)'){
-    detalle.push('Edictos: desde la publicación indicada.');
-  }
+  let notifEf = f; let detalle = [];
+  if(c==='DEV no leída' || c==='DEHú no leída'){ notifEf = addDays(f,10); detalle.push('DEV/DEHú no leída: notificado al décimo día natural.'); }
+  else if(c==='DEV leída' || c==='DEHú leída'){ detalle.push('DEV/DEHú leída: cuenta desde la lectura.'); }
+  else if(c==='Boletín en el acto'){ detalle.push('Boletín en el acto: desde el día siguiente.'); }
+  else if(c==='Postal'){ detalle.push('Postal: desde la recepción indicada.'); }
+  else if(c==='Edictos (TEU/BOE)'){ detalle.push('Edictos: desde la publicación.'); }
 
   let plazoFin, etiqueta;
-  if(esRecurso){
-    // Recurso de reposición: 1 mes desde la notificación de la resolución sancionadora
-    const base = fResol || notifEf;
-    plazoFin = addMonthsSameDay(base,1);
-    etiqueta = '1 mes (resolución)';
-    detalle.push('Recurso: 1 mes desde la notificación de la resolución sancionadora.');
-  }else{
-    // Alegaciones: mostramos dos referencias (naturales y hábiles) por seguridad
-    const finNat = addDays(notifEf,20);
-    const finHab = addBusinessDays(notifEf,20);
-    plazoFin = finNat; // mostramos naturales como principal
-    etiqueta = '20 días';
-    detalle.push(`Alegaciones: 20 días. Naturales: ${fmt(finNat)} · Hábiles aprox.: ${fmt(finHab)}.`);
-  }
+  if(esRecurso){ const base = fResol || notifEf; plazoFin = addMonthsSameDay(base,1); etiqueta='1 mes (resolución)'; detalle.push('Recurso: 1 mes desde la notificación de la resolución.'); }
+  else { const finNat = addDays(notifEf,20); const finHab = addBusinessDays(notifEf,20); plazoFin = finNat; etiqueta='20 días'; detalle.push(`Alegaciones: 20 días. Naturales: ${fmt(finNat)} · Hábiles aprox.: ${fmt(finHab)}.`); }
 
   outEfectiva.textContent = fmt(notifEf);
   outPlazo.textContent = fmt(plazoFin);
@@ -331,7 +313,6 @@ function calcPlazo(){
   outDetalle.textContent = detalle.join(' ');
   plazoBox.hidden = false;
 
-  // enviar al webhook
   notEf.value = notifEf.toISOString();
   plazoCalc.value = plazoFin.toISOString();
   plazoDet.value = outDetalle.textContent;
@@ -339,41 +320,39 @@ function calcPlazo(){
 canal.addEventListener('change', calcPlazo);
 fecha.addEventListener('change', calcPlazo);
 document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('change', calcPlazo);
-
-/* UX envío */
-const form = document.getElementById('form-dgt');
-const statusEl = document.getElementById('status');
-const btn = document.getElementById('btnSend');
 </script>
-  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+
+<!-- === 1) Carga la librería de PDF -->
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+
+<!-- === 2) Script de envío → Make → PDF en pestaña nueva === -->
 <script>
 (() => {
-  // Tus elementos (ya existen en tu HTML)
-  const form     = document.getElementById('form-dgt');   // <form ... id="form-dgt">
+  const form     = document.getElementById('form-dgt');
   const btn      = document.getElementById('btnSend');
   const statusEl = document.getElementById('status');
-
   const pdfPanel = document.getElementById('pdf-panel');
   const pdfFrame = document.getElementById('pdfFrame');
   const btnDesc  = document.getElementById('btnDescargar');
   const btnShare = document.getElementById('btnCompartir');
-
   if (!form) return;
 
-  // Usamos la URL que ya pusiste en action del form (tu webhook de Make)
   const WEBHOOK_URL = form.action;
 
-  // Contenedor invisible: aquí pegamos el HTML que devuelve Make para convertirlo a PDF
+  // Contenedor A4 “visible pero transparente” (si está hidden, algunos navegadores pintan en blanco)
   const container = document.createElement('div');
-  container.id = 'docHtmlContainer';
-  container.style.position = 'fixed';
-  container.style.left = '-10000px';
-  container.style.top = '0';
-  container.style.width = '210mm'; // A4
+  container.style.position   = 'fixed';
+  container.style.left       = '-10000px';
+  container.style.top        = '0';
+  container.style.visibility = 'visible';
+  container.style.opacity    = '0';
+  container.style.pointerEvents = 'none';
+  container.style.width      = '210mm';
+  container.style.minHeight  = '297mm';
   document.body.appendChild(container);
 
-  let lastBlob = null;
-  let lastUrl  = null;
+  let lastUrl = null;
+  let pendingWin = null;
 
   function setBusy(on){
     if (btn){ btn.disabled = on; btn.textContent = on ? 'Generando…' : 'Generar documento'; }
@@ -382,36 +361,46 @@ const btn = document.getElementById('btnSend');
 
   async function htmlToPdfBlob(html){
     container.innerHTML = html;
+    if (!container.textContent.trim()) throw new Error('El HTML está vacío (revisa mapeo en Make).');
+
     const opt = {
-      margin: [10,10,14,10],               // mm
+      margin: [10,10,14,10],
       filename: 'alegacion-dgt.pdf',
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
+      html2canvas: { scale: 2, useCORS: true, allowTaint: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
+
+    // Flujo compatible con 0.10.1 (evita PDFs en blanco)
     const worker = html2pdf().set(opt).from(container).toPdf();
     const pdf = await worker.get('pdf');
-    return pdf.output('blob'); // ← Blob del PDF
+    return pdf.output('blob');
   }
 
-  function showPdf(blob){
+  function presentPdf(win, blob){
     if (lastUrl) URL.revokeObjectURL(lastUrl);
-    lastBlob = blob;
-    lastUrl  = URL.createObjectURL(blob);
+    lastUrl = URL.createObjectURL(blob);
 
-    pdfFrame.src = lastUrl;
-    pdfPanel.hidden = false;
+    // Abrimos en la pestaña pre-creada (evita bloqueos)
+    if (win && !win.closed) win.location = lastUrl;
+    else window.open(lastUrl, '_blank');
+
+    // Opcional: mostrar panel con iframe y botones
+    if (pdfPanel) {
+      pdfPanel.hidden = false;
+      if (pdfFrame) pdfFrame.src = lastUrl;
+    }
 
     // Descargar
-    btnDesc.onclick = () => {
+    if (btnDesc) btnDesc.onclick = () => {
       const a = document.createElement('a');
       a.href = lastUrl;
       a.download = 'alegacion-dgt.pdf';
       a.click();
     };
 
-    // Compartir (Web Share API + fallback WhatsApp)
-    btnShare.onclick = async () => {
+    // Compartir
+    if (btnShare) btnShare.onclick = async () => {
       try {
         const file = new File([blob], 'alegacion-dgt.pdf', { type:'application/pdf' });
         if (navigator.canShare && navigator.canShare({ files:[file] })) {
@@ -426,18 +415,19 @@ const btn = document.getElementById('btnSend');
     };
   }
 
-  // Enviar el formulario → Make responde { ok:true, html:"<html>..." }
   form.addEventListener('submit', async (e) => {
-    // anti-bots (honeypot). Si está relleno, parar.
+    // anti-bot (honeypot)
     if (document.getElementById('web')?.value) { e.preventDefault(); return; }
 
-    e.preventDefault(); // no navegamos
+    e.preventDefault();
     setBusy(true);
+
+    // Abre ya una pestaña (vacía) para que el navegador no la bloquee
+    pendingWin = window.open('', '_blank');
 
     try {
       const fd  = new FormData(form);
       const res = await fetch(WEBHOOK_URL, { method:'POST', body: fd });
-
       if (!res.ok) {
         const txt = await res.text().catch(()=> '');
         throw new Error('HTTP ' + res.status + ' ' + txt);
@@ -445,22 +435,28 @@ const btn = document.getElementById('btnSend');
 
       const data = await res.json().catch(()=> ({}));
       if (!data || !data.ok || !data.html) {
-        throw new Error('La respuesta no trae { ok:true, html }');
+        throw new Error('La respuesta no trae { ok:true, html }. Revisa el Webhook response.');
       }
 
+      console.log('[doc_html]', (data.html || '').slice(0,200)); // debug
+
       const blob = await htmlToPdfBlob(data.html);
-      showPdf(blob);
-      if (statusEl) statusEl.textContent = 'Documento listo. Revísalo y descárgalo.';
+      presentPdf(pendingWin, blob);
+      pendingWin = null;
+
+      if (statusEl) statusEl.textContent = 'Documento listo. Abierto en nueva pestaña.';
     } catch (err) {
       console.error(err);
       alert('No se pudo generar el PDF.\n\n' + (err?.message || err));
       if (statusEl) statusEl.textContent = 'Error al generar el PDF.';
+      if (pendingWin && !pendingWin.closed) pendingWin.close();
+      pendingWin = null;
     } finally {
       setBusy(false);
     }
   });
 })();
 </script>
+
 </body>
 </html>
-<script>
