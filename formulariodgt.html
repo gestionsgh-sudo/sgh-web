@@ -56,11 +56,9 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--c-secondary)}
 
 <main class="container stack" style="padding:20px 0 28px">
   <section class="grid-2">
-
-    <!-- onsubmit inline como cinturón y tirantes -->
+    <!-- Formulario -->
     <form id="form-dgt" class="stack" method="POST" enctype="multipart/form-data"
-          action="https://hook.eu2.make.com/pa2zsel75tqx6bhyjptpkqr2gdf4kxks"
-          onsubmit="return handleDgtSubmit(event)">
+          action="https://hook.eu2.make.com/pa2zsel75tqx6bhyjptpkqr2gdf4kxks">
       <input type="hidden" name="form_name" value="dgt_multas">
       <input type="hidden" name="timestamp_iso" id="ts">
       <input type="hidden" name="source_url" id="src">
@@ -72,10 +70,11 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--c-secondary)}
       <h1 style="margin:0">DGT · Alegaciones (20 días) / Recurso (1 mes)</h1>
       <p class="small" style="margin:0;color:var(--c-muted)">Generamos tu escrito en PDF, con checklist y enlaces a Sede DGT y REG.</p>
 
-      <!-- … tu formulario completo aquí (tal como lo tienes) … -->
+      <!-- … (todo tu formulario igual que ya lo tienes) … -->
 
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button id="btnSend" class="btn btn-primary" type="submit">Generar documento</button>
+        <!-- 🔴 cambio: botón no-submit -->
+        <button id="btnSend" class="btn btn-primary" type="button">Generar documento</button>
         <a class="btn btn-secondary" href="paneles.html">Volver al panel</a>
       </div>
       <p id="status" class="small-muted" role="status" aria-live="polite"></p>
@@ -99,185 +98,173 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--c-secondary)}
   </div>
 </footer>
 
+<!-- ===== UI mínima necesaria que ya tenías (fechas/plazos/etc.) ===== -->
 <script>
-/* mínimos de UI */
 document.getElementById('ts').value = new Date().toISOString();
 document.getElementById('src').value = location.href;
+/* si aquí tienes más lógica (calcPlazo, etc.), déjala tal cual */
 </script>
 
-<!-- Librería PDF (defer para garantizar carga) -->
-<script defer src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<!-- 1) Librería PDF (debe ir antes del script principal) -->
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 
+<!-- 2) Generación: fetch → pinta en iframe → html2pdf → pestaña nueva -->
 <script>
-(() => {
+document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
-  // Exponemos la función global para el onsubmit inline
-  window.handleDgtSubmit = (e) => {
-    try {
-      e.preventDefault();
-    } catch(_) {}
-    generatePdfFlow().catch(err => {
-      console.error(err);
-      alert('No se pudo generar el PDF.\n\n' + (err?.message || err));
-      const statusEl = document.getElementById('status');
-      if (statusEl) statusEl.textContent = 'Error al generar el PDF.';
-    });
-    return false; // evitar envío nativo SIEMPRE
+  const form     = document.getElementById('form-dgt');
+  const btn      = document.getElementById('btnSend');
+  const statusEl = document.getElementById('status');
+  const pdfPanel = document.getElementById('pdf-panel');
+  const pdfFrame = document.getElementById('pdfFrame');
+  const btnDesc  = document.getElementById('btnDescargar');
+  const btnShare = document.getElementById('btnCompartir');
+
+  const WEBHOOK_URL = form.action;
+
+  // IFRAME oculto (no display:none para que renderice)
+  const iframe = document.createElement('iframe');
+  iframe.style.position='fixed';
+  iframe.style.left='-10000px';
+  iframe.style.top='0';
+  iframe.style.width='794px';      // A4 @96dpi
+  iframe.style.minHeight='1123px';
+  iframe.style.pointerEvents='none';
+  iframe.style.background='#fff';
+  document.body.appendChild(iframe);
+
+  let lastUrl = null;
+
+  const setBusy = on => {
+    if (btn){ btn.disabled = on; btn.textContent = on ? 'Generando…' : 'Generar documento'; }
+    if (statusEl){ statusEl.textContent = on ? 'Generando documento…' : ''; }
   };
 
-  // Doble enganche por si el inline no se ejecuta
-  window.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('form-dgt');
-    if (form) form.addEventListener('submit', window.handleDgtSubmit);
-  });
+  const waitForRender = async (doc) => {
+    try { if (doc.fonts && doc.fonts.ready) await doc.fonts.ready; } catch {}
+    const imgs = Array.from(doc.images || []);
+    await Promise.all(imgs.map(img => img.complete ? null : new Promise(res => { img.onload=img.onerror=res; })));
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  };
 
-  async function generatePdfFlow(){
-    const form     = document.getElementById('form-dgt');
-    const btn      = document.getElementById('btnSend');
-    const statusEl = document.getElementById('status');
-    const pdfPanel = document.getElementById('pdf-panel');
-    const pdfFrame = document.getElementById('pdfFrame');
-    const btnDesc  = document.getElementById('btnDescargar');
-    const btnShare = document.getElementById('btnCompartir');
+  async function htmlToPdfBlob(htmlString){
+    const html = String(htmlString || '');
+    if (!html.trim()) throw new Error('El HTML está vacío (revisa mapeo en Make).');
 
-    if (!form) throw new Error('No se encontró el formulario (#form-dgt).');
+    iframe.srcdoc = html;
+    await new Promise(resolve => { iframe.onload = resolve; setTimeout(resolve, 300); });
 
-    const WEBHOOK_URL = form.action;
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) throw new Error('No se pudo acceder al documento del iframe.');
 
-    const setBusy = (on) => {
-      if (btn){ btn.disabled = on; btn.textContent = on ? 'Generando…' : 'Generar documento'; }
-      if (statusEl){ statusEl.textContent = on ? 'Generando documento…' : ''; }
+    // Fix rápido por si el HTML no define fondo/tamaño
+    const fix = doc.createElement('style');
+    fix.textContent = `html,body{background:#fff;margin:0;padding:0} body{width:794px;min-height:1123px}`;
+    doc.head.appendChild(fix);
+
+    await waitForRender(doc);
+
+    const target = doc.body || doc.documentElement;
+    if (!target || !target.innerText.trim()) throw new Error('El HTML no se pintó en el iframe.');
+
+    const opt = {
+      margin: [10,10,14,10],
+      filename: 'alegacion-dgt.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        windowWidth: Math.max(target.scrollWidth, 800),
+        windowHeight: Math.max(target.scrollHeight, 1200),
+        letterRendering: true
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    // Crear IFRAME “render” fuera de pantalla
-    const iframe = document.createElement('iframe');
-    iframe.style.position='fixed';
-    iframe.style.left='-10000px';
-    iframe.style.top='0';
-    iframe.style.width='794px';      // A4 @96dpi
-    iframe.style.minHeight='1123px';
-    iframe.style.pointerEvents='none';
-    iframe.style.background='#fff';
-    document.body.appendChild(iframe);
+    const worker = html2pdf().set(opt).from(target).toCanvas().toPdf();
+    const pdf = await worker.get('pdf');
+    return pdf.output('blob');
+  }
 
-    // Abrimos la ventana por adelantado para evitar bloqueos
-    let pendingWin = window.open('about:blank', '_blank');
+  function presentPdf(blob){
+    if (lastUrl) URL.revokeObjectURL(lastUrl);
+    lastUrl = URL.createObjectURL(blob);
+
+    // Abre en pestaña nueva
+    window.open(lastUrl, '_blank', 'noopener');
+
+    // Muestra panel con acciones
+    pdfPanel.hidden = false;
+    pdfFrame.src = lastUrl;
+
+    if (btnDesc) btnDesc.onclick = () => {
+      const a = document.createElement('a');
+      a.href = lastUrl;
+      a.download = 'alegacion-dgt.pdf';
+      a.click();
+    };
+    if (btnShare) btnShare.onclick = async () => {
+      try {
+        const file = new File([blob], 'alegacion-dgt.pdf', { type:'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files:[file] })) {
+          await navigator.share({ title:'SGH · Documento DGT', text:'Te envío mi borrador en PDF.', files:[file] });
+        } else {
+          const txt = 'He generado mi borrador en PDF. Lo descargo y te lo adjunto.';
+          window.open('https://wa.me/?text='+encodeURIComponent(txt), '_blank');
+        }
+      } catch (e) { alert('No se pudo compartir: ' + (e?.message || e)); }
+    };
+  }
+
+  // 🔴 Acción principal: ya no usamos submit nativo
+  btn.addEventListener('click', async () => {
+    // Honeypot anti-bot
+    if (document.getElementById('web')?.value) return;
+
+    // Valida campos required del formulario
+    if (!form.reportValidity()) return;
 
     setBusy(true);
-
     try {
-      // anti-bot
-      if (document.getElementById('web')?.value) throw new Error('Bloqueo anti-bot.');
-
       const fd  = new FormData(form);
       const res = await fetch(WEBHOOK_URL, { method:'POST', body: fd });
-
       if (!res.ok) {
         const txt = await res.text().catch(()=> '');
         throw new Error('HTTP ' + res.status + ' ' + txt);
       }
 
-      // Parse seguro aunque ok venga como "true" (string)
       const data = await res.json().catch(()=> ({}));
-      const ok = data && (data.ok === true || data.ok === 'true');
-      const html = (data && data.html) ? String(data.html) : '';
-
-      if (!ok || !html.trim()) {
+      if (!data || !data.ok || !data.html) {
         throw new Error('La respuesta no trae { ok:true, html }. Revisa el Webhook response.');
       }
 
-      console.log('[doc_html length]', html.length);
+      console.log('[doc_html length]', (data.html || '').length);
+      const blob = await htmlToPdfBlob(data.html);
 
-      // Pintamos en el iframe (sin CORS gracias a srcdoc)
-      iframe.srcdoc = html;
-      await new Promise(res => { iframe.onload = res; setTimeout(res, 300); });
-
-      const doc = iframe.contentDocument || iframe.contentWindow?.document;
-      if (!doc) throw new Error('No se pudo acceder al documento del iframe.');
-      const target = doc.body || doc.documentElement;
-
-      // Forzamos baseline de estilos para evitar hojas en blanco
-      const fix = doc.createElement('style');
-      fix.textContent = `
-        @page{size:A4;margin:10mm}
-        html,body{background:#fff!important;color:#111!important;margin:0;padding:0}
-        body{width:794px;min-height:1123px}
-      `;
-      doc.head.appendChild(fix);
-
-      // Esperar fuentes/imagenes
-      try { if (doc.fonts && doc.fonts.ready) await doc.fonts.ready; } catch {}
-      const imgs = Array.from(doc.images || []);
-      await Promise.all(imgs.map(img => img.complete ? null : new Promise(r => { img.onload=img.onerror=r; })));
-      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-      if (!target || !target.innerText.trim()) {
-        throw new Error('El HTML no se pintó en el iframe (doc_html vacío).');
-      }
-
-      // Asegurar que la librería está lista
-      if (typeof html2pdf === 'undefined') throw new Error('html2pdf no está cargado.');
-
-      const opt = {
-        margin: [10,10,14,10],
-        filename: 'alegacion-dgt.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          scale: 2, useCORS: true, allowTaint: true,
-          backgroundColor: '#ffffff',
-          windowWidth: Math.max(target.scrollWidth, 800),
-          windowHeight: Math.max(target.scrollHeight, 1200),
-          letterRendering: true
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      // Cadena estable (evita PDFs en blanco)
-      const worker = html2pdf().set(opt).from(target).toCanvas().toPdf();
-      const pdf = await worker.get('pdf');
-      const blob = pdf.output('blob');
-
-      // Si sospechosamente pequeño, fallback a impresión
+      // Fallback: si es sospechosamente pequeño, probablemente blanco
       if (blob.size < 20000) {
-        console.warn('PDF pequeño, uso fallback print(). size=', blob.size);
-        const w = pendingWin && !pendingWin.closed ? pendingWin : window.open('', '_blank');
-        const d = w.document;
-        d.open();
-        d.write(`<!doctype html><html><head><meta charset="utf-8"><title>Imprimir PDF</title>
-          <style>@page{size:A4;margin:10mm}html,body{background:#fff}</style></head><body>${html}
-          <script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`);
-        d.close();
-        if (statusEl) statusEl.textContent = 'Abierto en modo impresión (fallback).';
-        return;
+        console.warn('PDF muy pequeño; abro fallback impresión. Tamaño:', blob.size);
+        const w = window.open('', '_blank', 'noopener');
+        w.document.write(data.html);
+        w.document.close();
+        setTimeout(() => w.print(), 400);
+        statusEl.textContent = 'Abierto en modo impresión (fallback).';
+      } else {
+        presentPdf(blob);
+        statusEl.textContent = 'Documento listo. Abierto en nueva pestaña.';
       }
-
-      // Presentación
-      const url = URL.createObjectURL(blob);
-      if (pendingWin && !pendingWin.closed) pendingWin.location = url; else window.open(url, '_blank');
-      pendingWin = null;
-
-      if (pdfPanel) { pdfPanel.hidden = false; if (pdfFrame) pdfFrame.src = url; }
-      if (btnDesc) btnDesc.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = 'alegacion-dgt.pdf'; a.click(); };
-      if (btnShare) btnShare.onclick = async () => {
-        try {
-          const file = new File([blob], 'alegacion-dgt.pdf', { type:'application/pdf' });
-          if (navigator.canShare && navigator.canShare({ files:[file] })) {
-            await navigator.share({ title:'SGH · Documento DGT', text:'Te envío mi borrador en PDF.', files:[file] });
-          } else {
-            const txt = 'He generado mi borrador en PDF. Lo descargo y te lo adjunto.';
-            window.open('https://wa.me/?text='+encodeURIComponent(txt), '_blank');
-          }
-        } catch(e){ alert('No se pudo compartir: ' + (e?.message || e)); }
-      };
-
-      if (statusEl) statusEl.textContent = 'Documento listo. Abierto en nueva pestaña.';
+    } catch (err) {
+      console.error(err);
+      alert('No se pudo generar el PDF.\n\n' + (err?.message || err));
+      statusEl.textContent = 'Error al generar el PDF.';
     } finally {
       setBusy(false);
     }
-  }
-})();
+  });
+});
 </script>
-
 </body>
 </html>
