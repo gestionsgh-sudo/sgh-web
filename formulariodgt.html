@@ -344,10 +344,6 @@ document.querySelector('input[name="fecha_resolucion"]')?.addEventListener('chan
 const form = document.getElementById('form-dgt');
 const statusEl = document.getElementById('status');
 const btn = document.getElementById('btnSend');
-form.addEventListener('submit', (e)=>{
-  if(document.getElementById('web').value){ e.preventDefault(); return; } // bot
-  btn.disabled = true; btn.textContent = 'Enviando…'; statusEl.textContent='Enviando…';
-});
 </script>
   <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <script>
