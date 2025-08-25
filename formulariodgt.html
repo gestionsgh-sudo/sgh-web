@@ -1,270 +1,244 @@
 <!doctype html>
-<html lang="es-ES">
+<html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SGH | DGT · Alegaciones (20 días) / Recurso (1 mes)</title>
-<link rel="stylesheet" href="style.css">
-<style>
-.page-head{background:#fff;border-bottom:1px solid var(--c-border)}
-.page-head .container{display:flex;align-items:center;gap:12px;padding:12px var(--gap)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--c-text)}
-.brand-badge{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--c-primary);background:color-mix(in srgb,var(--c-primary) 12%, #fff);border:1px solid var(--c-border)}
-.grid-2{display:grid;gap:16px}
-@media(min-width:1000px){ .grid-2{grid-template-columns:1fr 380px} }
-fieldset{border:1px solid var(--c-border);border-radius:14px;padding:12px;background:#fff}
-legend{font-weight:800;padding:0 6px}
-label{display:block;margin:6px 0 4px}
-input[type="text"],input[type="email"],input[type="date"],select,textarea{width:100%;height:44px;border:1px solid var(--c-border);border-radius:12px;padding:0 12px;background:#fff}
-textarea{min-height:120px;padding:12px}
-input[type="checkbox"],input[type="radio"]{accent-color:var(--c-secondary)}
-.row-2{display:grid;gap:12px}
-@media(min-width:700px){ .row-2{grid-template-columns:1fr 1fr} }
-.help{color:var(--c-muted);font-size:14px}
-.small-muted{font-size:12px;color:var(--c-muted)}
-.hr{height:1px;background:var(--c-border);margin:10px 0}
-.notice-inline{background:color-mix(in srgb,var(--c-warning) 14%, #fff);border:1px solid var(--c-border);padding:10px;border-radius:10px}
-.deadline{background:#fff;border:1px dashed var(--c-border);border-radius:12px;padding:12px}
-.badge-soft{display:inline-block;border-radius:999px;padding:4px 10px;font-size:12px;background:color-mix(in srgb,var(--c-primary) 10%,#fff);border:1px solid var(--c-border)}
-.hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DGT · Alegaciones / Recurso | SGH</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-<header class="page-head">
+<header class="header">
   <div class="container">
-    <a href="index.html" class="brand" aria-label="Inicio">
-      <div class="brand-badge">S</div><span>SGH</span>
-    </a>
-    <nav class="nav" aria-label="principal" style="margin-left:auto;display:flex;gap:14px;flex-wrap:wrap">
-      <a href="paneles.html">Trámites</a>
-      <a href="quienes-somos.html">¿Quiénes somos?</a>
-      <a href="aviso-legal.html">Legal</a>
-      <a href="contacto.html">Contacto</a>
-    </nav>
+    <a class="logo" href="index.html"><span class="logo-mark">S</span> SGH</a>
+    <nav class="nav"><a href="legislacion.html">Biblioteca legal</a></nav>
   </div>
 </header>
 
-<section id="pdf-panel" class="card" hidden>
-  <h2 style="margin:0 0 10px">Documento generado</h2>
-  <div style="display:flex;gap:10px;margin:8px 0 12px">
-    <button id="btnDescargar" class="btn btn-primary" type="button">Descargar PDF</button>
-    <button id="btnCompartir" class="btn btn-ghost" type="button">Compartir…</button>
-  </div>
-  <iframe id="pdfFrame" style="width:100%;height:70vh;border:1px solid var(--c-border);border-radius:10px;background:#fff"></iframe>
-</section>
+<main class="container stack">
+  <section class="card">
+    <h1 style="margin:0 0 8px">DGT · Alegaciones / Recurso</h1>
+    <p class="small" style="margin:0 0 16px;color:var(--c-muted)">
+      Rellena el formulario. Generaremos la plantilla ajustada a tu caso con referencias legales.
+    </p>
 
-<main class="container stack" style="padding:20px 0 28px">
-  <section class="grid-2">
-    <!-- Formulario -->
-    <form id="form-dgt" class="stack" method="POST" enctype="multipart/form-data"
-          action="https://hook.eu2.make.com/5lb1ro4uapa7ui8c0f4pbuj5kg6jqopq">
-      <input type="hidden" name="form_name" value="dgt_multas">
-      <input type="hidden" name="timestamp_iso" id="ts">
-      <input type="hidden" name="source_url" id="src">
-      <input type="hidden" name="plazo_calculado" id="plazo_calculado">
-      <input type="hidden" name="plazo_detalle" id="plazo_detalle">
-      <input type="hidden" name="notificacion_efectiva" id="not_efectiva">
-      <div class="hp"><label for="web">Si ves esto, déjalo vacío</label><input id="web" name="website"></div>
+    <form id="dgtForm" class="stack" enctype="multipart/form-data">
+      <input type="hidden" name="form_name" value="dgt_multas" />
+      <input type="hidden" name="website" value="https://gestionsgh-sudo.github.io/sgh-web/" />
+      <input type="hidden" name="source_url" value="https://github.com/gestionsgh-sudo/sgh-web" />
 
-      <h1 style="margin:0">DGT · Alegaciones (20 días) / Recurso (1 mes)</h1>
-      <p class="small" style="margin:0;color:var(--c-muted)">Generamos tu escrito en PDF, con checklist y enlaces a Sede DGT y REG.</p>
-
-      <!-- … (todo tu formulario igual que ya lo tienes) … -->
-
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <!-- 🔴 cambio: botón no-submit -->
-        <button id="btnSend" class="btn btn-primary" type="button">Generar documento</button>
-        <a class="btn btn-secondary" href="paneles.html">Volver al panel</a>
+      <div class="row">
+        <div class="col" style="grid-column: span 6">
+          <label>Nombre *</label>
+          <input required name="nombre" autocomplete="name" />
+        </div>
+        <div class="col" style="grid-column: span 6">
+          <label>Apellidos *</label>
+          <input required name="apellidos" />
+        </div>
       </div>
-      <p id="status" class="small-muted" role="status" aria-live="polite"></p>
+
+      <div class="row">
+        <div class="col" style="grid-column: span 4">
+          <label>DNI/NIE *</label>
+          <input required name="dni" />
+        </div>
+        <div class="col" style="grid-column: span 8">
+          <label>Correo electrónico *</label>
+          <input type="email" required name="email" autocomplete="email" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col" style="grid-column: span 12">
+          <label>Domicilio completo *</label>
+          <input required name="domicilio" placeholder="Calle, número, piso..." />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col" style="grid-column: span 4">
+          <label>Localidad *</label>
+          <input required name="localidad" />
+        </div>
+        <div class="col" style="grid-column: span 4">
+          <label>Provincia *</label>
+          <input required name="provincia" />
+        </div>
+        <div class="col" style="grid-column: span 4">
+          <label>Código postal *</label>
+          <input required name="cp" inputmode="numeric" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col" style="grid-column: span 6">
+          <label>Actúas como *</label>
+          <select name="actua_como" required>
+            <option value="" selected disabled>Selecciona</option>
+            <option value="interesado">Interesado/a</option>
+            <option value="representante">Representante</option>
+          </select>
+        </div>
+        <div class="col" style="grid-column: span 6">
+          <label>Nº expediente / referencia *</label>
+          <input required name="expediente" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col" style="grid-column: span 6">
+          <label>Matrícula del vehículo *</label>
+          <input required name="matricula" />
+        </div>
+        <div class="col" style="grid-column: span 6">
+          <label>Tipo de escrito *</label>
+          <select name="tipo" required>
+            <option value="" disabled selected>Selecciona</option>
+            <option value="alegaciones">Alegaciones</option>
+            <option value="recurso">Recurso de reposición</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col" style="grid-column: span 4">
+          <label>Canal de notificación *</label>
+          <select name="canal" required>
+            <option value="" disabled selected>Selecciona</option>
+            <option>DEV no leída</option>
+            <option>DEV leída</option>
+            <option>Postal</option>
+          </select>
+        </div>
+        <div class="col" style="grid-column: span 4">
+          <label>Fecha del hecho *</label>
+          <input type="date" required name="fecha_evento" />
+        </div>
+        <div class="col" style="grid-column: span 4">
+          <label>Fecha resolución (si la hay)</label>
+          <input type="date" name="fecha_resolucion" />
+        </div>
+      </div>
+
+      <details class="card" style="background:#fbfdff">
+        <summary><b>¿Eres representante?</b> (opcional)</summary>
+        <div class="row" style="margin-top:10px">
+          <div class="col" style="grid-column: span 6">
+            <label>Nombre del representado</label>
+            <input name="rep_nombre" />
+          </div>
+          <div class="col" style="grid-column: span 6">
+            <label>DNI del representado</label>
+            <input name="rep_dni" />
+          </div>
+          <div class="col" style="grid-column: span 12">
+            <label>Autorización (PDF/JPG) </label>
+            <input type="file" name="rep_autorizacion" accept=".pdf,.jpg,.jpeg,.png" />
+          </div>
+        </div>
+      </details>
+
+      <div class="card" style="background:#fbfdff">
+        <label style="display:block;margin-bottom:6px"><b>Motivos que aplican</b> (marca los que procedan)</label>
+        <div class="bullets">
+          <label><input type="checkbox" name="motivos[]" value="no_conductor" /> No era el conductor</label>
+          <label><input type="checkbox" name="motivos[]" value="senalizacion" /> Señalización deficiente</label>
+          <label><input type="checkbox" name="motivos[]" value="metrologia" /> Error de metrología / calibración</label>
+          <label><input type="checkbox" name="motivos[]" value="defectos_formales" /> Defectos formales / falta de motivación</label>
+        </div>
+      </div>
+
+      <div class="stack">
+        <label>Relato de hechos *</label>
+        <textarea required name="relato" rows="6" placeholder="Describe lo ocurrido..."></textarea>
+      </div>
+
+      <div class="stack">
+        <label>Anexos (opcional, varios archivos)</label>
+        <input type="file" name="archivos[]" multiple accept=".pdf,.jpg,.jpeg,.png" />
+      </div>
+
+      <div class="stack">
+        <label class="small"><input type="checkbox" required name="veracidad" /> Declaro que la información aportada es veraz.</label>
+        <label class="small"><input type="checkbox" required name="consentimiento" /> Acepto la Política de Privacidad y el Aviso legal.</label>
+      </div>
+
+      <div class="row">
+        <div class="col" style="grid-column: span 6">
+          <button class="btn btn-primary" type="submit" id="btnEnviar">Generar plantilla</button>
+        </div>
+        <div class="col" style="grid-column: span 6; text-align:right">
+          <a class="btn btn-secondary" href="legislacion.html">Ver base legal</a>
+        </div>
+      </div>
     </form>
 
-    <aside class="stack">
-      <section class="notice"><b>Transparencia:</b> Este asistente genera un borrador. Léelo antes de firmarlo y presentarlo.</section>
-    </aside>
+    <!-- Resultado -->
+    <div id="resultado" class="card" style="display:none;margin-top:16px">
+      <h3 style="margin:0 0 8px">Plantilla generada</h3>
+      <p class="small" id="resultadoMsg">Tu documento está listo.</p>
+      <div class="row">
+        <div class="col" style="grid-column: span 4"><a id="btnDescargar" class="btn btn-primary" download>Descargar PDF</a></div>
+        <div class="col" style="grid-column: span 4"><a id="btnWhats" class="btn btn-secondary" target="_blank" rel="noopener">Enviar por WhatsApp</a></div>
+        <div class="col" style="grid-column: span 4"><a id="btnGmail" class="btn btn-secondary" target="_blank" rel="noopener">Enviar por Gmail</a></div>
+      </div>
+      <small class="small">También recibirás un email con instrucciones.</small>
+    </div>
   </section>
 </main>
 
-<footer class="footer">
-  <div class="container cols">
-    <div class="small">© SGH – Datos mínimos, sin publicidad ni seguimiento.</div>
-    <div style="display:flex;gap:14px;flex-wrap:wrap">
-      <a href="aviso-legal.html">Aviso legal</a>
-      <a href="privacidad.html">Privacidad</a>
-      <a href="cookies.html">Cookies</a>
-      <a href="contacto.html">Contacto</a>
-    </div>
-  </div>
-</footer>
-
-<!-- ===== UI mínima necesaria que ya tenías (fechas/plazos/etc.) ===== -->
 <script>
-document.getElementById('ts').value = new Date().toISOString();
-document.getElementById('src').value = location.href;
-/* si aquí tienes más lógica (calcPlazo, etc.), déjala tal cual */
-</script>
+  // 1) Pega aquí tu webhook de Make (el de dgt_multas)
+  const MAKE_WEBHOOK_URL = "https://hook.eu2.make.com/XXXXXXXXXXXXXXXXXXXXXXXX";
 
-<!-- 1) Librería PDF (debe ir antes del script principal) -->
-<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  // 2) Envío del formulario a Make y gestión de la respuesta
+  const f = document.getElementById('dgtForm');
+  const btn = document.getElementById('btnEnviar');
+  const box = document.getElementById('resultado');
+  const msg = document.getElementById('resultadoMsg');
+  const aPdf = document.getElementById('btnDescargar');
+  const aWsp = document.getElementById('btnWhats');
+  const aGml = document.getElementById('btnGmail');
 
-<!-- 2) Generación: fetch → pinta en iframe → html2pdf → pestaña nueva -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  'use strict';
+  f.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    btn.disabled = true; btn.textContent = "Generando…";
+    const data = new FormData(f);
 
-  const form     = document.getElementById('form-dgt');
-  const btn      = document.getElementById('btnSend');
-  const statusEl = document.getElementById('status');
-  const pdfPanel = document.getElementById('pdf-panel');
-  const pdfFrame = document.getElementById('pdfFrame');
-  const btnDesc  = document.getElementById('btnDescargar');
-  const btnShare = document.getElementById('btnCompartir');
-
-  const WEBHOOK_URL = form.action;
-
-  // IFRAME oculto (no display:none para que renderice)
-  const iframe = document.createElement('iframe');
-  iframe.style.position='fixed';
-  iframe.style.left='-10000px';
-  iframe.style.top='0';
-  iframe.style.width='794px';      // A4 @96dpi
-  iframe.style.minHeight='1123px';
-  iframe.style.pointerEvents='none';
-  iframe.style.background='#fff';
-  document.body.appendChild(iframe);
-
-  let lastUrl = null;
-
-  const setBusy = on => {
-    if (btn){ btn.disabled = on; btn.textContent = on ? 'Generando…' : 'Generar documento'; }
-    if (statusEl){ statusEl.textContent = on ? 'Generando documento…' : ''; }
-  };
-
-  const waitForRender = async (doc) => {
-    try { if (doc.fonts && doc.fonts.ready) await doc.fonts.ready; } catch {}
-    const imgs = Array.from(doc.images || []);
-    await Promise.all(imgs.map(img => img.complete ? null : new Promise(res => { img.onload=img.onerror=res; })));
-    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-  };
-
-  async function htmlToPdfBlob(htmlString){
-    const html = String(htmlString || '');
-    if (!html.trim()) throw new Error('El HTML está vacío (revisa mapeo en Make).');
-
-    iframe.srcdoc = html;
-    await new Promise(resolve => { iframe.onload = resolve; setTimeout(resolve, 300); });
-
-    const doc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (!doc) throw new Error('No se pudo acceder al documento del iframe.');
-
-    // Fix rápido por si el HTML no define fondo/tamaño
-    const fix = doc.createElement('style');
-    fix.textContent = `html,body{background:#fff;margin:0;padding:0} body{width:794px;min-height:1123px}`;
-    doc.head.appendChild(fix);
-
-    await waitForRender(doc);
-
-    const target = doc.body || doc.documentElement;
-    if (!target || !target.innerText.trim()) throw new Error('El HTML no se pintó en el iframe.');
-
-    const opt = {
-      margin: [10,10,14,10],
-      filename: 'alegacion-dgt.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        windowWidth: Math.max(target.scrollWidth, 800),
-        windowHeight: Math.max(target.scrollHeight, 1200),
-        letterRendering: true
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    const worker = html2pdf().set(opt).from(target).toCanvas().toPdf();
-    const pdf = await worker.get('pdf');
-    return pdf.output('blob');
-  }
-
-  function presentPdf(blob){
-    if (lastUrl) URL.revokeObjectURL(lastUrl);
-    lastUrl = URL.createObjectURL(blob);
-
-    // Abre en pestaña nueva
-    window.open(lastUrl, '_blank', 'noopener');
-
-    // Muestra panel con acciones
-    pdfPanel.hidden = false;
-    pdfFrame.src = lastUrl;
-
-    if (btnDesc) btnDesc.onclick = () => {
-      const a = document.createElement('a');
-      a.href = lastUrl;
-      a.download = 'alegacion-dgt.pdf';
-      a.click();
-    };
-    if (btnShare) btnShare.onclick = async () => {
-      try {
-        const file = new File([blob], 'alegacion-dgt.pdf', { type:'application/pdf' });
-        if (navigator.canShare && navigator.canShare({ files:[file] })) {
-          await navigator.share({ title:'SGH · Documento DGT', text:'Te envío mi borrador en PDF.', files:[file] });
-        } else {
-          const txt = 'He generado mi borrador en PDF. Lo descargo y te lo adjunto.';
-          window.open('https://wa.me/?text='+encodeURIComponent(txt), '_blank');
-        }
-      } catch (e) { alert('No se pudo compartir: ' + (e?.message || e)); }
-    };
-  }
-
-  // 🔴 Acción principal: ya no usamos submit nativo
-  btn.addEventListener('click', async () => {
-    // Honeypot anti-bot
-    if (document.getElementById('web')?.value) return;
-
-    // Valida campos required del formulario
-    if (!form.reportValidity()) return;
-
-    setBusy(true);
-    try {
-      const fd  = new FormData(form);
-      const res = await fetch(WEBHOOK_URL, { method:'POST', body: fd });
-      if (!res.ok) {
-        const txt = await res.text().catch(()=> '');
-        throw new Error('HTTP ' + res.status + ' ' + txt);
+    try{
+      const res = await fetch(MAKE_WEBHOOK_URL, { method: 'POST', body: data });
+      // Esperamos un JSON con: { ok:true, pdf_url:"...", file_name:"..." }
+      let out;
+      const ct = res.headers.get('content-type')||'';
+      if(ct.includes('application/json')){
+        out = await res.json();
+      }else{
+        // fallback: texto -> intentar parsear
+        const t = await res.text();
+        try{ out = JSON.parse(t) }catch{ out = { ok:res.ok, raw:t } }
       }
 
-      const data = await res.json().catch(()=> ({}));
-      if (!data || !data.ok || !data.html) {
-        throw new Error('La respuesta no trae { ok:true, html }. Revisa el Webhook response.');
+      // Si tu escenario ahora mismo no responde JSON,
+      // puedes “simular” un link usando tu Make/Drive/etc.
+      // out.pdf_url debe ser una URL directa descargable al PDF generado.
+      if(out && out.pdf_url){
+        msg.textContent = "Documento listo. Revisa y firma.";
+        aPdf.href = out.pdf_url;
+        aWsp.href = `https://wa.me/?text=${encodeURIComponent("Te comparto mi alegación/recurso DGT generada por SGH: "+out.pdf_url)}`;
+        aGml.href = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent("Alegación/Rec. DGT")}&body=${encodeURIComponent("Enlace al documento: "+out.pdf_url)}`;
+        box.style.display = 'block';
+        box.scrollIntoView({behavior:'smooth'});
+      }else{
+        msg.textContent = "Enviado. Recibirás el documento por correo.";
+        box.style.display = 'block';
       }
-
-      console.log('[doc_html length]', (data.html || '').length);
-      const blob = await htmlToPdfBlob(data.html);
-
-      // Fallback: si es sospechosamente pequeño, probablemente blanco
-      if (blob.size < 20000) {
-        console.warn('PDF muy pequeño; abro fallback impresión. Tamaño:', blob.size);
-        const w = window.open('', '_blank', 'noopener');
-        w.document.write(data.html);
-        w.document.close();
-        setTimeout(() => w.print(), 400);
-        statusEl.textContent = 'Abierto en modo impresión (fallback).';
-      } else {
-        presentPdf(blob);
-        statusEl.textContent = 'Documento listo. Abierto en nueva pestaña.';
-      }
-    } catch (err) {
+    }catch(err){
+      alert("No se pudo enviar. Comprueba conexión o el webhook de Make.");
       console.error(err);
-      alert('No se pudo generar el PDF.\n\n' + (err?.message || err));
-      statusEl.textContent = 'Error al generar el PDF.';
-    } finally {
-      setBusy(false);
+    }finally{
+      btn.disabled = false; btn.textContent = "Generar plantilla";
     }
   });
-});
 </script>
 </body>
 </html>
