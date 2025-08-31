@@ -1,0 +1,91 @@
+<script>
+(() => {
+  // 1) Cargamos html2pdf de forma dinámica (una sola vez).
+  let html2pdfReady;
+  function ensureHtml2pdf() {
+    if (!html2pdfReady) {
+      html2pdfReady = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js';
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error('No se pudo cargar html2pdf.js'));
+        document.head.appendChild(s);
+      });
+    }
+    return html2pdfReady;
+  }
+
+  // Convierte HTML (string) -> Blob PDF
+  async function htmlToPdfBlob(html, filename='escrito-dgt.pdf') {
+    await ensureHtml2pdf();
+
+    const parsed = new DOMParser().parseFromString(html, 'text/html');
+    const container = document.createElement('div');
+    if (parsed && parsed.body) container.append(...parsed.body.childNodes);
+    else container.innerHTML = html;
+
+    const opt = {
+      margin: 10,
+      filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    const worker = window.html2pdf().set(opt).from(container).toPdf();
+    const pdf = await worker.get('pdf');
+    return pdf.output('blob');
+  }
+
+  // 2) Interceptamos fetch SOLO para llamadas a hook.*.make.com
+  const originalFetch = window.fetch.bind(window);
+
+  window.fetch = async function(input, init) {
+    let url = typeof input === 'string' ? input : (input && input.url) || '';
+    const isMakeWebhook = /https?:\/\/hook\.(?:eu\d+|us\d+)\.make\.com\//i.test(url);
+
+    const res = await originalFetch(input, init);
+
+    // Si no es webhook de Make, devolvemos tal cual.
+    if (!isMakeWebhook) return res;
+
+    // Leemos la respuesta; si trae {html, filename}, generamos pdf_url.
+    try {
+      const ct = (res.headers.get('content-type') || '').toLowerCase();
+      const cloned = res.clone();
+      let payload;
+
+      if (ct.includes('application/json')) {
+        payload = await cloned.json();
+      } else {
+        const text = await cloned.text();
+        try { payload = JSON.parse(text); } catch { payload = { raw: text }; }
+      }
+
+      if (payload && typeof payload.html === 'string' && payload.html.includes('<html')) {
+        const filename = (payload.filename || 'escrito-dgt.pdf').replace(/[^\w\-.]/g, '_');
+        const blob = await htmlToPdfBlob(payload.html, filename);
+        const blobUrl = URL.createObjectURL(blob);
+
+        const newBody = JSON.stringify({
+          ok: true,
+          file_name: filename,
+          pdf_url: blobUrl
+        });
+
+        return new Response(newBody, {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Si ya viene pdf_url o no hay html, devolvemos la respuesta original
+      return res;
+    } catch (e) {
+      // Ante cualquier problema, no rompemos: devolvemos la respuesta original.
+      console.warn('pdf-hook falló, devolviendo respuesta original:', e);
+      return res;
+    }
+  };
+})();
+</script>
